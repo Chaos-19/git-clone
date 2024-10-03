@@ -1,0 +1,139 @@
+{
+  ".gitignore": {
+    "name": ".gitignore",
+    "mode": 33188,
+    "sha1": "69e3f00d66f60db4b05c80c6c41d1b193f1f15d3"
+  },
+  "Read.md": {
+    "name": "Read.md",
+    "mode": 33188,
+    "sha1": "49be1c5565a1a4bc8dec079fc54d5184a3edbd6d"
+  },
+  "TODO.md": {
+    "name": "TODO.md",
+    "mode": 33188,
+    "sha1": "4e49bc78110c949ef53152f941dbed4a868c1ac8"
+  },
+  "eslint.config.mjs": {
+    "name": "eslint.config.mjs",
+    "mode": 33188,
+    "sha1": "4adec29bc9b10ab6927f6a65efd6c6ab66d19ca6"
+  },
+  "jest.config.js": {
+    "name": "jest.config.js",
+    "mode": 33188,
+    "sha1": "f5d30d13b959c752b3738e2f26e96a4fb1bcce5d"
+  },
+  "package-lock.json": {
+    "name": "package-lock.json",
+    "mode": 33188,
+    "sha1": "f6ee3aed08d400f51db237d9b82ac117d1259a94"
+  },
+  "package.json": {
+    "name": "package.json",
+    "mode": 33188,
+    "sha1": "46ce5def1e1243a7a931825cc7b37e63224b706a"
+  },
+  "src": {
+    "adapters": {
+      "FsFileAdapter.ts": {
+        "name": "FsFileAdapter.ts",
+        "mode": 33188,
+        "sha1": "4c1d611959a7f28463cd409674342be8e2bd3c00"
+      }
+    },
+    "cltools": {
+      "commandParser.ts": {
+        "name": "commandParser.ts",
+        "mode": 33188,
+        "sha1": "77016f5099866d9baa0a9bdb9068de86b41beb80"
+      }
+    },
+    "index.ts": {
+      "name": "index.ts",
+      "mode": 33188,
+      "sha1": "7e19baf14eeb8bb5c1cf8e00307ea778fa79b473"
+    },
+    "managers": {
+      "GitSysManager.ts": {
+        "name": "GitSysManager.ts",
+        "mode": 33188,
+        "sha1": "051956cab9a0db1cd3959362b638c9edf96a20df"
+      }
+    },
+    "models": {
+      "Author.ts": {
+        "name": "Author.ts",
+        "mode": 33188,
+        "sha1": "7f7a1af4e98da96c158cef3695b9b4fd10b7a346"
+      },
+      "Blob.ts": {
+        "name": "Blob.ts",
+        "mode": 33188,
+        "sha1": "6f516332ae0cd578bfc36016b74dbbfe33965f09"
+      },
+      "Commit.ts": {
+        "name": "Commit.ts",
+        "mode": 33188,
+        "sha1": "84be03784b62433985319bdf671f84f9d4148245"
+      },
+      "Entry.ts": {
+        "name": "Entry.ts",
+        "mode": 33188,
+        "sha1": "72e813407e01f5783a06b3231e2e3bb83d4dcb08"
+      },
+      "Head.ts": {
+        "name": "Head.ts",
+        "mode": 33188,
+        "sha1": "a9d7434971baed1cd0cb88e8f97d87972bbd35a5"
+      },
+      "Index.ts": {
+        "name": "Index.ts",
+        "mode": 33188,
+        "sha1": "01ba4fbeff7e69f3aeef1cde815ea0b3626e022a"
+      },
+      "Tree.ts": {
+        "name": "Tree.ts",
+        "mode": 33188,
+        "sha1": "b4ac0b3395bb329c0c7f7e177630f63020c1f5d2"
+      },
+      "test.ts": {
+        "name": "test.ts",
+        "mode": 33188,
+        "sha1": "c8f675d1d525b0de89bb3b6f908182883278f10b"
+      }
+    },
+    "repository": {
+      "Repository.ts": {
+        "name": "Repository.ts",
+        "mode": 33188,
+        "sha1": "990b32498c624b8b5aa71da75afdb85ed5eb11b3"
+      },
+      "Workspace.ts": {
+        "name": "Workspace.ts",
+        "mode": 33188,
+        "sha1": "c5a014d4050c77f1efd504327debbf4bbbb716c5"
+      }
+    },
+    "types.ts": {
+      "name": "types.ts",
+      "mode": 33188,
+      "sha1": "6fe658596f921bd24fb232b35c25350c0be070fc"
+    },
+    "utils": {
+      "utils.ts": {
+        "name": "utils.ts",
+        "mode": 33188,
+        "sha1": "a09a3f855d100198243cdb9432458a9c3cbdfc9a"
+      }
+    }
+  },
+  "tsconfig.json": {
+    "name": "tsconfig.json",
+    "mode": 33188,
+    "sha1": "87e8f31c5b3e967355a6a2b8b48f1c56b29f4765"
+  },
+  "6utils": {},
+  "0\n�\\k�_\u0015\u001dyMlv޷��[\u0015\u0002\tWadapters": {},
+  "ry": {}
+}

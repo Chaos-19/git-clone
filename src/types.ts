@@ -5,7 +5,7 @@ export interface EntryType<T, P = string> {
     mtime_n: T;
     dev: T;
     ino: T;
-    mode: T | p;
+    mode: T;
     uid: T;
     gid: T;
     size: T;

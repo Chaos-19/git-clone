@@ -8,7 +8,7 @@ export class Entry {
     mtime_n: number; // nanoseconds since epoch
     dev: number; // device number
     ino: number; // inode number
-    mode: number | string; // file mode
+    mode: number; // file mode
     uid: number; // user ID
     gid: number; // group ID
     size: number; // file size in bytes
@@ -23,7 +23,7 @@ export class Entry {
         mtime_n: number,
         dev: number,
         ino: number,
-        mode: number | string,
+        mode: number,
         uid: number,
         gid: number,
         size: number,

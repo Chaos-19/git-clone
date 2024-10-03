@@ -21,6 +21,11 @@ export class Index {
     getEntries(): Entry[] {
         return this.entries;
     }
+    entryExists(filePath: string): boolean {
+        return this.readIndex().some(
+            entry => entry.path.toString() == filePath
+        );
+    }
     readIndex(): EntryType<number, Buffer>[] {
         const data = this.fs.readFileSync(".git/index");
 

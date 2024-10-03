@@ -16,4 +16,5 @@ const repo = new Repository(
 /*repo.init();
 repo.add("TODO.md");
  */
-console.log(repo.readIndex().map(v => ({ ...v, path: v.path.toString() })));
+//console.log(repo. );
+repo.writeTree();

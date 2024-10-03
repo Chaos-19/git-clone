@@ -11,6 +11,7 @@ import { Author } from "../models/Author";
 import { FileAdapter, FsFileAdapter } from "../adapters/FsFileAdapter";
 
 import { convertTimeToGit, getFileMode } from "../utils/utils";
+import { EntryType } from "../types";
 
 export class Repository {
     private name: string;
@@ -100,7 +101,7 @@ export class Repository {
                 mtime_n,
                 dev,
                 ino,
-                getFileMode(mode),
+                mode,
                 uid,
                 gid,
                 size,
@@ -121,10 +122,11 @@ export class Repository {
     // Write index to tree
     writeTree(): Tree {
         const tree = new Tree(this.generateId());
-        this.index.getEntries().forEach(entry => {
+        /*this.index.getEntries().forEach(entry => {
             tree.addEntry(entry);
-        });
-        console.log("Tree written from index.");
+        });*/
+        const treeHash = tree.createTreeHash(this.readIndex());
+        console.log("Tree written from index. : ", treeHash);
         return tree;
     }
 
@@ -134,8 +136,11 @@ export class Repository {
     }
 
     // Read index from disk
-    readIndex(): any {
-        return this.index.readIndex();
+    readIndex(): EntryType<number>[] {
+        return this.index
+            .readIndex()
+            .map(v => ({ ...v, path: v.path.toString() }));
+        //.splice(0, -3);
     }
 
     // Commit logic

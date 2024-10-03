@@ -1,0 +1,897 @@
+[{
+  "ctime_s": 1727771303,
+  "ctime_n": 223999195,
+  "mtime_s": 1727771303,
+  "mtime_n": 223999195,
+  "dev": 66333,
+  "ino": 367698,
+  "mode": 33188,
+  "uid": 10780,
+  "gid": 10780,
+  "size": 28,
+  "sha1": "69e3f00d66f60db4b05c80c6c41d1b193f1f15d3",
+  "flags": 10,
+  "path": ".gitignore"
+},
+  {
+    "ctime_s": 1726759482,
+    "ctime_n": 3999850,
+    "mtime_s": 1726759482,
+    "mtime_n": 3999850,
+    "dev": 66333,
+    "ino": 2675218,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 5642,
+    "sha1": "49be1c5565a1a4bc8dec079fc54d5184a3edbd6d",
+    "flags": 7,
+    "path": "Read.md"
+  },
+  {
+    "ctime_s": 1727634232,
+    "ctime_n": 917171543,
+    "mtime_s": 1727634232,
+    "mtime_n": 917171543,
+    "dev": 66333,
+    "ino": 2662989,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 7958,
+    "sha1": "4e49bc78110c949ef53152f941dbed4a868c1ac8",
+    "flags": 7,
+    "path": "TODO.md"
+  },
+  {
+    "ctime_s": 1726593590,
+    "ctime_n": 974999876,
+    "mtime_s": 1726593590,
+    "mtime_n": 974999876,
+    "dev": 66333,
+    "ino": 2672870,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 407,
+    "sha1": "4adec29bc9b10ab6927f6a65efd6c6ab66d19ca6",
+    "flags": 17,
+    "path": "eslint.config.mjs"
+  },
+  {
+    "ctime_s": 1726593587,
+    "ctime_n": 822999878,
+    "mtime_s": 1726593587,
+    "mtime_n": 822999878,
+    "dev": 66333,
+    "ino": 2641860,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 156,
+    "sha1": "f5d30d13b959c752b3738e2f26e96a4fb1bcce5d",
+    "flags": 14,
+    "path": "jest.config.js"
+  },
+  {
+    "ctime_s": 1726591273,
+    "ctime_n": 398999353,
+    "mtime_s": 1726591273,
+    "mtime_n": 398999353,
+    "dev": 66333,
+    "ino": 2662072,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 225295,
+    "sha1": "f6ee3aed08d400f51db237d9b82ac117d1259a94",
+    "flags": 17,
+    "path": "package-lock.json"
+  },
+  {
+    "ctime_s": 1727515812,
+    "ctime_n": 748997166,
+    "mtime_s": 1727515812,
+    "mtime_n": 748997166,
+    "dev": 66333,
+    "ino": 2656680,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 882,
+    "sha1": "46ce5def1e1243a7a931825cc7b37e63224b706a",
+    "flags": 12,
+    "path": "package.json"
+  },
+  {
+    "ctime_s": 1727638262,
+    "ctime_n": 769168661,
+    "mtime_s": 1727638262,
+    "mtime_n": 769168661,
+    "dev": 66333,
+    "ino": 340214,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 2111,
+    "sha1": "4c1d611959a7f28463cd409674342be8e2bd3c00",
+    "flags": 29,
+    "path": "src/adapters/FsFileAdapter.ts"
+  },
+  {
+    "ctime_s": 1727524216,
+    "ctime_n": 83443238,
+    "mtime_s": 1727524216,
+    "mtime_n": 83443238,
+    "dev": 66333,
+    "ino": 339836,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 60,
+    "sha1": "77016f5099866d9baa0a9bdb9068de86b41beb80",
+    "flags": 28,
+    "path": "src/cltools/commandParser.ts"
+  },
+  {
+    "ctime_s": 1727769667,
+    "ctime_n": 829453160,
+    "mtime_s": 1727769667,
+    "mtime_n": 829453160,
+    "dev": 66333,
+    "ino": 2673846,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 15803,
+    "sha1": "7e19baf14eeb8bb5c1cf8e00307ea778fa79b473",
+    "flags": 12,
+    "path": "src/index.ts"
+  },
+  {
+    "ctime_s": 1727536722,
+    "ctime_n": 383433519,
+    "mtime_s": 1727536722,
+    "mtime_n": 383433519,
+    "dev": 66333,
+    "ino": 2700094,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 916,
+    "sha1": "051956cab9a0db1cd3959362b638c9edf96a20df",
+    "flags": 29,
+    "path": "src/managers/GitSysManager.ts"
+  },
+  {
+    "ctime_s": 1727516825,
+    "ctime_n": 200996442,
+    "mtime_s": 1727516825,
+    "mtime_n": 200996442,
+    "dev": 66333,
+    "ino": 101165,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 541,
+    "sha1": "7f7a1af4e98da96c158cef3695b9b4fd10b7a346",
+    "flags": 20,
+    "path": "src/models/Author.ts"
+  },
+  {
+    "ctime_s": 1727516820,
+    "ctime_n": 980996445,
+    "mtime_s": 1727516820,
+    "mtime_n": 980996445,
+    "dev": 66333,
+    "ino": 99826,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 228,
+    "sha1": "6f516332ae0cd578bfc36016b74dbbfe33965f09",
+    "flags": 18,
+    "path": "src/models/Blob.ts"
+  },
+  {
+    "ctime_s": 1727516810,
+    "ctime_n": 500996452,
+    "mtime_s": 1727516810,
+    "mtime_n": 500996452,
+    "dev": 66333,
+    "ino": 2682411,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 797,
+    "sha1": "84be03784b62433985319bdf671f84f9d4148245",
+    "flags": 20,
+    "path": "src/models/Commit.ts"
+  },
+  {
+    "ctime_s": 1727758114,
+    "ctime_n": 35454690,
+    "mtime_s": 1727758114,
+    "mtime_n": 35454690,
+    "dev": 66333,
+    "ino": 2655344,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 3600,
+    "sha1": "72e813407e01f5783a06b3231e2e3bb83d4dcb08",
+    "flags": 19,
+    "path": "src/models/Entry.ts"
+  },
+  {
+    "ctime_s": 1727516815,
+    "ctime_n": 816996448,
+    "mtime_s": 1727516815,
+    "mtime_n": 816996448,
+    "dev": 66333,
+    "ino": 102782,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 269,
+    "sha1": "a9d7434971baed1cd0cb88e8f97d87972bbd35a5",
+    "flags": 18,
+    "path": "src/models/Head.ts"
+  },
+  {
+    "ctime_s": 1727772070,
+    "ctime_n": 643998646,
+    "mtime_s": 1727772070,
+    "mtime_n": 643998646,
+    "dev": 66333,
+    "ino": 2676690,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 3994,
+    "sha1": "01ba4fbeff7e69f3aeef1cde815ea0b3626e022a",
+    "flags": 19,
+    "path": "src/models/Index.ts"
+  },
+  {
+    "ctime_s": 1727516807,
+    "ctime_n": 852996454,
+    "mtime_s": 1727516807,
+    "mtime_n": 852996454,
+    "dev": 66333,
+    "ino": 2655178,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 314,
+    "sha1": "b4ac0b3395bb329c0c7f7e177630f63020c1f5d2",
+    "flags": 18,
+    "path": "src/models/Tree.ts"
+  },
+  {
+    "ctime_s": 1727718151,
+    "ctime_n": 891589266,
+    "mtime_s": 1727718151,
+    "mtime_n": 891589266,
+    "dev": 66333,
+    "ino": 331719,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 574,
+    "sha1": "c8f675d1d525b0de89bb3b6f908182883278f10b",
+    "flags": 18,
+    "path": "src/models/test.ts"
+  },
+  {
+    "ctime_s": 1727758194,
+    "ctime_n": 211454633,
+    "mtime_s": 1727758194,
+    "mtime_n": 211454633,
+    "dev": 66333,
+    "ino": 80035,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 6396,
+    "sha1": "990b32498c624b8b5aa71da75afdb85ed5eb11b3",
+    "flags": 28,
+    "path": "src/repository/Repository.ts"
+  },
+  {
+    "ctime_s": 1727518816,
+    "ctime_n": 775999929,
+    "mtime_s": 1727518816,
+    "mtime_n": 775999929,
+    "dev": 66333,
+    "ino": 76536,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 273,
+    "sha1": "c5a014d4050c77f1efd504327debbf4bbbb716c5",
+    "flags": 27,
+    "path": "src/repository/Workspace.ts"
+  },
+  {
+    "ctime_s": 1727758061,
+    "ctime_n": 55454728,
+    "mtime_s": 1727758061,
+    "mtime_n": 55454728,
+    "dev": 66333,
+    "ino": 2707231,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 250,
+    "sha1": "6fe658596f921bd24fb232b35c25350c0be070fc",
+    "flags": 12,
+    "path": "src/types.ts"
+  },
+  {
+    "ctime_s": 1727757905,
+    "ctime_n": 711454839,
+    "mtime_s": 1727757905,
+    "mtime_n": 711454839,
+    "dev": 66333,
+    "ino": 91751,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 1662,
+    "sha1": "a09a3f855d100198243cdb9432458a9c3cbdfc9a",
+    "flags": 18,
+    "path": "src/utils/utils.ts"
+  },
+  {
+    "ctime_s": 1727452904,
+    "ctime_n": 906993594,
+    "mtime_s": 1727452904,
+    "mtime_n": 906993594,
+    "dev": 66333,
+    "ino": 2582948,
+    "mode": 33188,
+    "uid": 10780,
+    "gid": 10780,
+    "size": 355,
+    "sha1": "87e8f31c5b3e967355a6a2b8b48f1c56b29f4765",
+    "flags": 13,
+    "path": "tsconfig.json"
+  },
+  {
+    "ctime_s": 1414677829,
+    "ctime_n": 249,
+    "mtime_s": 3290144,
+    "mtime_n": 822752806,
+    "dev": 1464449994,
+    "ino": 1638763916,
+    "mode": 509287221,
+    "uid": 4144145482,
+    "gid": 173241202,
+    "size": 1660956982,
+    "sha1": "20360a0e11c4a0dd2570ea7eaff071b40c424e7b",
+    "flags": 27400,
+    "path": "6utils"
+  },
+  {
+    "ctime_s": 173243746,
+    "ctime_n": 2136054653,
+    "mtime_s": 3816054171,
+    "mtime_n": 3282408838,
+    "dev": 3191860171,
+    "ino": 3396169572,
+    "mode": 1701606144,
+    "uid": 941633546,
+    "gid": 1819694349,
+    "size": 113460739,
+    "sha1": "0a5b99625f8ea731503a76be636c746f6f6c7300",
+    "flags": 12576,
+    "path": "0\n�\\k�_\x15\x1DyMlv޷��[\x15\x02\tWadapters"
+  },
+  {
+    "ctime_s": 168286567,
+    "ctime_n": 1660263064,
+    "mtime_s": 1462827797,
+    "mtime_n": 2355262481,
+    "dev": 2101818144,
+    "ino": 1466786158,
+    "mode": 1634166130,
+    "uid": 1929392416,
+    "gid": 806000791,
+    "size": 2663314828,
+    "sha1": "040d5059374969423d478d78e6b07265706f7369",
+    "flags": 29807,
+    "path": "ry"
+  }]
+
+undefined
+
+> git-node@1.0.0 dev-t
+> ts-node src/models/test.ts
+
+[{
+  ctime_s: 1727771303,
+  ctime_n: 223999195,
+  mtime_s: 1727771303,
+  mtime_n: 223999195,
+  dev: 66333,
+  ino: 367698,
+  mode: 33188,
+  uid: 10780,
+  gid: 10780,
+  size: 28,
+  sha1: '69e3f00d66f60db4b05c80c6c41d1b193f1f15d3',
+  flags: 10,
+  path: '.gitignore'
+},
+  {
+    ctime_s: 1726759482,
+    ctime_n: 3999850,
+    mtime_s: 1726759482,
+    mtime_n: 3999850,
+    dev: 66333,
+    ino: 2675218,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 5642,
+    sha1: '49be1c5565a1a4bc8dec079fc54d5184a3edbd6d',
+    flags: 7,
+    path: 'Read.md'
+  },
+  {
+    ctime_s: 1727634232,
+    ctime_n: 917171543,
+    mtime_s: 1727634232,
+    mtime_n: 917171543,
+    dev: 66333,
+    ino: 2662989,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 7958,
+    sha1: '4e49bc78110c949ef53152f941dbed4a868c1ac8',
+    flags: 7,
+    path: 'TODO.md'
+  },
+  {
+    ctime_s: 1726593590,
+    ctime_n: 974999876,
+    mtime_s: 1726593590,
+    mtime_n: 974999876,
+    dev: 66333,
+    ino: 2672870,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 407,
+    sha1: '4adec29bc9b10ab6927f6a65efd6c6ab66d19ca6',
+    flags: 17,
+    path: 'eslint.config.mjs'
+  },
+  {
+    ctime_s: 1726593587,
+    ctime_n: 822999878,
+    mtime_s: 1726593587,
+    mtime_n: 822999878,
+    dev: 66333,
+    ino: 2641860,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 156,
+    sha1: 'f5d30d13b959c752b3738e2f26e96a4fb1bcce5d',
+    flags: 14,
+    path: 'jest.config.js'
+  },
+  {
+    ctime_s: 1726591273,
+    ctime_n: 398999353,
+    mtime_s: 1726591273,
+    mtime_n: 398999353,
+    dev: 66333,
+    ino: 2662072,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 225295,
+    sha1: 'f6ee3aed08d400f51db237d9b82ac117d1259a94',
+    flags: 17,
+    path: 'package-lock.json'
+  },
+  {
+    ctime_s: 1727515812,
+    ctime_n: 748997166,
+    mtime_s: 1727515812,
+    mtime_n: 748997166,
+    dev: 66333,
+    ino: 2656680,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 882,
+    sha1: '46ce5def1e1243a7a931825cc7b37e63224b706a',
+    flags: 12,
+    path: 'package.json'
+  },
+  {
+    ctime_s: 1727638262,
+    ctime_n: 769168661,
+    mtime_s: 1727638262,
+    mtime_n: 769168661,
+    dev: 66333,
+    ino: 340214,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 2111,
+    sha1: '4c1d611959a7f28463cd409674342be8e2bd3c00',
+    flags: 29,
+    path: 'src/adapters/FsFileAdapter.ts'
+  },
+  {
+    ctime_s: 1727524216,
+    ctime_n: 83443238,
+    mtime_s: 1727524216,
+    mtime_n: 83443238,
+    dev: 66333,
+    ino: 339836,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 60,
+    sha1: '77016f5099866d9baa0a9bdb9068de86b41beb80',
+    flags: 28,
+    path: 'src/cltools/commandParser.ts'
+  },
+  {
+    ctime_s: 1727769667,
+    ctime_n: 829453160,
+    mtime_s: 1727769667,
+    mtime_n: 829453160,
+    dev: 66333,
+    ino: 2673846,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 15803,
+    sha1: '7e19baf14eeb8bb5c1cf8e00307ea778fa79b473',
+    flags: 12,
+    path: 'src/index.ts'
+  },
+  {
+    ctime_s: 1727536722,
+    ctime_n: 383433519,
+    mtime_s: 1727536722,
+    mtime_n: 383433519,
+    dev: 66333,
+    ino: 2700094,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 916,
+    sha1: '051956cab9a0db1cd3959362b638c9edf96a20df',
+    flags: 29,
+    path: 'src/managers/GitSysManager.ts'
+  },
+  {
+    ctime_s: 1727516825,
+    ctime_n: 200996442,
+    mtime_s: 1727516825,
+    mtime_n: 200996442,
+    dev: 66333,
+    ino: 101165,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 541,
+    sha1: '7f7a1af4e98da96c158cef3695b9b4fd10b7a346',
+    flags: 20,
+    path: 'src/models/Author.ts'
+  },
+  {
+    ctime_s: 1727516820,
+    ctime_n: 980996445,
+    mtime_s: 1727516820,
+    mtime_n: 980996445,
+    dev: 66333,
+    ino: 99826,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 228,
+    sha1: '6f516332ae0cd578bfc36016b74dbbfe33965f09',
+    flags: 18,
+    path: 'src/models/Blob.ts'
+  },
+  {
+    ctime_s: 1727516810,
+    ctime_n: 500996452,
+    mtime_s: 1727516810,
+    mtime_n: 500996452,
+    dev: 66333,
+    ino: 2682411,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 797,
+    sha1: '84be03784b62433985319bdf671f84f9d4148245',
+    flags: 20,
+    path: 'src/models/Commit.ts'
+  },
+  {
+    ctime_s: 1727758114,
+    ctime_n: 35454690,
+    mtime_s: 1727758114,
+    mtime_n: 35454690,
+    dev: 66333,
+    ino: 2655344,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 3600,
+    sha1: '72e813407e01f5783a06b3231e2e3bb83d4dcb08',
+    flags: 19,
+    path: 'src/models/Entry.ts'
+  },
+  {
+    ctime_s: 1727516815,
+    ctime_n: 816996448,
+    mtime_s: 1727516815,
+    mtime_n: 816996448,
+    dev: 66333,
+    ino: 102782,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 269,
+    sha1: 'a9d7434971baed1cd0cb88e8f97d87972bbd35a5',
+    flags: 18,
+    path: 'src/models/Head.ts'
+  },
+  {
+    ctime_s: 1727772070,
+    ctime_n: 643998646,
+    mtime_s: 1727772070,
+    mtime_n: 643998646,
+    dev: 66333,
+    ino: 2676690,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 3994,
+    sha1: '01ba4fbeff7e69f3aeef1cde815ea0b3626e022a',
+    flags: 19,
+    path: 'src/models/Index.ts'
+  },
+  {
+    ctime_s: 1727516807,
+    ctime_n: 852996454,
+    mtime_s: 1727516807,
+    mtime_n: 852996454,
+    dev: 66333,
+    ino: 2655178,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 314,
+    sha1: 'b4ac0b3395bb329c0c7f7e177630f63020c1f5d2',
+    flags: 18,
+    path: 'src/models/Tree.ts'
+  },
+  {
+    ctime_s: 1727718151,
+    ctime_n: 891589266,
+    mtime_s: 1727718151,
+    mtime_n: 891589266,
+    dev: 66333,
+    ino: 331719,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 574,
+    sha1: 'c8f675d1d525b0de89bb3b6f908182883278f10b',
+    flags: 18,
+    path: 'src/models/test.ts'
+  },
+  {
+    ctime_s: 1727758194,
+    ctime_n: 211454633,
+    mtime_s: 1727758194,
+    mtime_n: 211454633,
+    dev: 66333,
+    ino: 80035,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 6396,
+    sha1: '990b32498c624b8b5aa71da75afdb85ed5eb11b3',
+    flags: 28,
+    path: 'src/repository/Repository.ts'
+  },
+  {
+    ctime_s: 1727518816,
+    ctime_n: 775999929,
+    mtime_s: 1727518816,
+    mtime_n: 775999929,
+    dev: 66333,
+    ino: 76536,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 273,
+    sha1: 'c5a014d4050c77f1efd504327debbf4bbbb716c5',
+    flags: 27,
+    path: 'src/repository/Workspace.ts'
+  },
+  {
+    ctime_s: 1727758061,
+    ctime_n: 55454728,
+    mtime_s: 1727758061,
+    mtime_n: 55454728,
+    dev: 66333,
+    ino: 2707231,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 250,
+    sha1: '6fe658596f921bd24fb232b35c25350c0be070fc',
+    flags: 12,
+    path: 'src/types.ts'
+  },
+  {
+    ctime_s: 1727757905,
+    ctime_n: 711454839,
+    mtime_s: 1727757905,
+    mtime_n: 711454839,
+    dev: 66333,
+    ino: 91751,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 1662,
+    sha1: 'a09a3f855d100198243cdb9432458a9c3cbdfc9a',
+    flags: 18,
+    path: 'src/utils/utils.ts'
+  },
+  {
+    ctime_s: 1727452904,
+    ctime_n: 906993594,
+    mtime_s: 1727452904,
+    mtime_n: 906993594,
+    dev: 66333,
+    ino: 2582948,
+    mode: 33188,
+    uid: 10780,
+    gid: 10780,
+    size: 355,
+    sha1: '87e8f31c5b3e967355a6a2b8b48f1c56b29f4765',
+    flags: 13,
+    path: 'tsconfig.json'
+  }]
+src
+adapters
+src
+cltools
+src
+src
+managers
+src
+models
+src
+models
+src
+models
+src
+models
+src
+models
+src
+models
+src
+models
+src
+models
+src
+repository
+src
+repository
+src
+src
+utils
+{
+  '.gitignore': {
+    name: '.gitignore',
+    mode: '100644',
+    sha1: '69e3f00d66f60db4b05c80c6c41d1b193f1f15d3'
+  },
+  'Read.md': {
+    name: 'Read.md',
+    mode: '100644',
+    sha1: '49be1c5565a1a4bc8dec079fc54d5184a3edbd6d'
+  },
+  'TODO.md': {
+    name: 'TODO.md',
+    mode: '100644',
+    sha1: '4e49bc78110c949ef53152f941dbed4a868c1ac8'
+  },
+  'eslint.config.mjs': {
+    name: 'eslint.config.mjs',
+    mode: '100644',
+    sha1: '4adec29bc9b10ab6927f6a65efd6c6ab66d19ca6'
+  },
+  'jest.config.js': {
+    name: 'jest.config.js',
+    mode: '100644',
+    sha1: 'f5d30d13b959c752b3738e2f26e96a4fb1bcce5d'
+  },
+  'package-lock.json': {
+    name: 'package-lock.json',
+    mode: '100644',
+    sha1: 'f6ee3aed08d400f51db237d9b82ac117d1259a94'
+  },
+  'package.json': {
+    name: 'package.json',
+    mode: '100644',
+    sha1: '46ce5def1e1243a7a931825cc7b37e63224b706a'
+  },
+  src: {
+    adapters: {
+      'FsFileAdapter.ts': [Object]
+    },
+    cltools: {
+      'commandParser.ts': [Object]
+    },
+    'index.ts': {
+      name: 'index.ts',
+      mode: '100644',
+      sha1: '7e19baf14eeb8bb5c1cf8e00307ea778fa79b473'
+    },
+    managers: {
+      'GitSysManager.ts': [Object]
+    },
+    models: {
+      'Author.ts': [Object],
+      'Blob.ts': [Object],
+      'Commit.ts': [Object],
+      'Entry.ts': [Object],
+      'Head.ts': [Object],
+      'Index.ts': [Object],
+      'Tree.ts': [Object],
+      'test.ts': [Object]
+    },
+    repository: {
+      'Repository.ts': [Object],
+      'Workspace.ts': [Object]
+    },
+    'types.ts': {
+      name: 'types.ts',
+      mode: '100644',
+      sha1: '6fe658596f921bd24fb232b35c25350c0be070fc'
+    },
+    utils: {
+      'utils.ts': [Object]
+    }
+  },
+  'tsconfig.json': {
+    name: 'tsconfig.json',
+    mode: '100644',
+    sha1: '87e8f31c5b3e967355a6a2b8b48f1c56b29f4765'
+  }
+}
+hashes
+hashes
+hashes
+hashes
+hashes
+hashes
+adapters
+cltools
+managers
+models
+repository
+utils
+hashes
+src
+hashes
+Tree written from index. :  36265749bbca61ad8d8c1e5b1b35f702a44a0a53
