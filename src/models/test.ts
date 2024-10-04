@@ -18,3 +18,4 @@ repo.add("TODO.md");
  */
 //console.log(repo. );
 repo.writeTree();
+//repo.commit("add tree hash method");

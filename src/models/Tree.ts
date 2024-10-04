@@ -25,12 +25,13 @@ export class Tree {
     }
 
     createTreeHash(entries: EntryType<number>[]) {
-        console.log(entries.slice(0, -3));
-        const dirStructure = this.createCompleteStructure(
-            entries.slice(0, -3)
-        );
-        console.log(dirStructure);
-        return this.computeTreeHash(dirStructure);
+        const dirStructure = this.createCompleteStructure(entries);
+        const [hash, content] = this.computeTreeHash(dirStructure, true);
+
+        console.log(hash);
+        console.log(content);
+
+        return hash;
     }
 
     createCompleteStructure(arr: EntryType<number>[]) {
@@ -52,9 +53,10 @@ export class Tree {
                     };
                 } else {
                     //should chack if the entry actual file path
-                    console.log(part);
-                    current[part] = current[part] || {};
-                    current = current[part];
+                    if (this.fs.existsSync(path.join(dir.path))) {
+                        current[part] = current[part] || {};
+                        current = current[part];
+                    }
                 }
             });
         });
@@ -62,8 +64,6 @@ export class Tree {
         return result;
     }
     combineHashes(hashes: Buffer[]) {
-        console.log("hashes");
-
         const entriesBuffer = Buffer.concat(hashes);
 
         const treeHeader = Buffer.from(
@@ -79,9 +79,12 @@ export class Tree {
         return treeHash;
     }
 
-    computeTreeHash(dirTree: {
-        [key: string]: { name: string; mode: number; sha1: string } | any;
-    }) {
+    computeTreeHash(
+        dirTree: {
+            [key: string]: { name: string; mode: number; sha1: string } | any;
+        },
+        isRoot: boolean = false
+    ) {
         let hashes = [];
 
         for (let entry in dirTree) {
@@ -106,8 +109,6 @@ export class Tree {
             if (
                 !/(\w+\.+\w+)|(^\.\w+)/.test(Object.entries(dirTree)[index][0])
             ) {
-                console.log(Object.entries(dirTree)[index][0]);
-
                 return Buffer.concat([
                     Buffer.from(`40000 ${Object.entries(dirTree)[index][0]}\0`),
                     Buffer.from(entr, "hex")
@@ -116,6 +117,6 @@ export class Tree {
         });
 
         const directoryHash = this.combineHashes(hashes);
-        return directoryHash;
+        return isRoot ? [directoryHash, hashes] : directoryHash;
     }
 }

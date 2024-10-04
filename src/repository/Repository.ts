@@ -126,6 +126,7 @@ export class Repository {
             tree.addEntry(entry);
         });*/
         const treeHash = tree.createTreeHash(this.readIndex());
+        this.commit("add tree hash method", treeHash as string);
         console.log("Tree written from index. : ", treeHash);
         return tree;
     }
@@ -144,15 +145,16 @@ export class Repository {
     }
 
     // Commit logic
-    commit(message: string): void {
+    commit(message: string, treeHah: string): void {
         const newCommit = new Commit(
+            treeHah,
             this.generateId(),
-            null,
-            new Author(null, "chaos-19", "kalgetachew375@gmail.com"),
+            "54183769da277d4c7489267d91c48011594d05ca",
+            new Author(null, "Chaos-19", "kalgetachew375@gmail.com"),
             message
         );
-        this.commits.push(newCommit);
-        console.log(`Commit created: ${message}`);
+        //this.commits.push(newCommit);
+        console.log(`Commit created: ${newCommit.createCommitHash()}`);
     }
 
     // Display commit log
