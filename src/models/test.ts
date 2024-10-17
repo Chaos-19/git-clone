@@ -17,5 +17,7 @@ const repo = new Repository(
 repo.add("TODO.md");
  */
 //console.log(repo. );
-repo.writeTree();
-//repo.commit("add tree hash method");
+//repo.writeTree();
+repo.writeIndex();
+repo.readIndex();
+//repo.commit("add parse tree method", repo.writeTree());

@@ -122,7 +122,11 @@ export class Tree {
         return isRoot ? [directoryHash, hashes] : directoryHash;
     }
 
-    parseTree(treeSh1: string) {
+    parseTree(
+        treeSh1: string,
+        entryList: { mode: string; fileName: string; sha1: string }[] = [],
+        nesteDir: string[] = []
+    ) {
         const treeDir = treeSh1.slice(0, 2);
         const treeFile = treeSh1.slice(2);
 
@@ -135,7 +139,7 @@ export class Tree {
 
         let entries = unCompressTree.slice(nullByte + 1);
 
-        const entryList = [];
+        //let entryList = [];
 
         while (entries.length) {
             const [mode, fileName] = entries
@@ -146,15 +150,26 @@ export class Tree {
             const sha1 = entries.slice(0, 20);
 
             const entLen = entries.indexOf("\x00") + 22;
+            if (mode == "40000")
+                entryList = [
+                    ...entryList,
+                    ...this.parseTree(sha1.toString("hex"), [], [
+                        ...nesteDir,
+                        fileName
+                    ])
+                ];
+            else
+                entryList.push({
+                    mode,
+                    fileName:
+                        (!nesteDir.length ? "" : `${nesteDir.join("/")}/`) +
+                        fileName,
+                    sha1: sha1.toString("hex")
+                });
 
-            console.log({
-                mode,
-                fileName,
-                sha1: sha1.toString("hex")
-            });
             entries = entries.slice(20);
         }
 
-        console.log(entryList);
+        return entryList;
     }
 }

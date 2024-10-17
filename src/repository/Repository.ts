@@ -120,7 +120,7 @@ export class Repository {
     }
 
     // Write index to tree
-    writeTree(): Tree {
+    writeTree() {
         const tree = new Tree(this.generateId());
         /*this.index.getEntries().forEach(entry => {
             tree.addEntry(entry);
@@ -130,14 +130,16 @@ export class Repository {
             "add commit hash object creator method",
             treeHash as string
         );
-        console.log(tree.parseTree("d480411569862211d67d0f990b75ceb36f7a5fd6"));
+
         console.log("Tree written from index. : ", treeHash);
-        return tree;
+        return treeHash;
     }
 
     // Write index to disk
     writeIndex(): void {
         console.log("Index written to disk.");
+        const tree = new Tree(this.generateId());
+        console.log(tree.parseTree("f02e195535003ba20bcd3e6327ace27d766e351f"));
     }
 
     // Read index from disk
@@ -153,7 +155,7 @@ export class Repository {
         const newCommit = new Commit(
             treeHah,
             this.generateId(),
-            "e2a1f59ab6b91bba25572da0e7d32752eb6ddba8",
+            "eb59cc2f788983db59e35dcbbd11409e5d58d1f4",
             new Author(null, "Chaos-19", "kalgetachew375@gmail.com"),
             message
         );
