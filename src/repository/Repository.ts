@@ -126,7 +126,11 @@ export class Repository {
             tree.addEntry(entry);
         });*/
         const treeHash = tree.createTreeHash(this.readIndex());
-        this.commit("add tree hash method", treeHash as string);
+        this.commit(
+            "add commit hash object creator method",
+            treeHash as string
+        );
+        console.log(tree.parseTree("d480411569862211d67d0f990b75ceb36f7a5fd6"));
         console.log("Tree written from index. : ", treeHash);
         return tree;
     }
@@ -149,7 +153,7 @@ export class Repository {
         const newCommit = new Commit(
             treeHah,
             this.generateId(),
-            "54183769da277d4c7489267d91c48011594d05ca",
+            "e2a1f59ab6b91bba25572da0e7d32752eb6ddba8",
             new Author(null, "Chaos-19", "kalgetachew375@gmail.com"),
             message
         );

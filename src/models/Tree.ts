@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import * as path from "path";
+import zlib from "zlib";
 
 import { FileAdapter, FsFileAdapter } from "../adapters/FsFileAdapter";
 import { Entry } from "./Entry";
@@ -25,6 +26,7 @@ export class Tree {
     }
 
     createTreeHash(entries: EntryType<number>[]) {
+        console.log(entries);
         const dirStructure = this.createCompleteStructure(entries);
         const [hash, content] = this.computeTreeHash(dirStructure, true);
 
@@ -118,5 +120,41 @@ export class Tree {
 
         const directoryHash = this.combineHashes(hashes);
         return isRoot ? [directoryHash, hashes] : directoryHash;
+    }
+
+    parseTree(treeSh1: string) {
+        const treeDir = treeSh1.slice(0, 2);
+        const treeFile = treeSh1.slice(2);
+
+        const treePath = `.git/objects/${treeDir}/${treeFile}`;
+        const treeContent = this.fs.readFileSync(treePath);
+
+        const unCompressTree = zlib.unzipSync(treeContent);
+
+        const nullByte = unCompressTree.indexOf("\0");
+
+        let entries = unCompressTree.slice(nullByte + 1);
+
+        const entryList = [];
+
+        while (entries.length) {
+            const [mode, fileName] = entries
+                .slice(0, entries.indexOf("\x00"))
+                .toString()
+                .split(" ");
+            entries = entries.slice(entries.indexOf("\x00") + 1);
+            const sha1 = entries.slice(0, 20);
+
+            const entLen = entries.indexOf("\x00") + 22;
+
+            console.log({
+                mode,
+                fileName,
+                sha1: sha1.toString("hex")
+            });
+            entries = entries.slice(20);
+        }
+
+        console.log(entryList);
     }
 }

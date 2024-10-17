@@ -29,10 +29,10 @@ export class Commit {
         return this.id;
     }
 
-    setParent(): void {
+    /*setParent(): void {
       const parentCommit = this.fs
         this.parent;
-    }
+    }*/
     getParent(): string {
         return this.parent;
     }
@@ -54,10 +54,10 @@ export class Commit {
         commitInfo.push(`tree ${this.treeHash}`);
         if (this.parent !== "") commitInfo.push(`parent ${this.parent}`);
         commitInfo.push(
-            `author ${this.author.getUsername()} <${this.author.getEmail()}> 1727951668 +0300`
+            `author ${this.author.getUsername()} <${this.author.getEmail()}> 1728066901 +0300`
         );
         commitInfo.push(
-            `committer ${this.author.getUsername()} <${this.author.getEmail()}> 1727951668 +0300`
+            `committer ${this.author.getUsername()} <${this.author.getEmail()}> 1728066901 +0300`
         );
         commitInfo.push(``);
         commitInfo.push(this.message);
