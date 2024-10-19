@@ -122,15 +122,15 @@ export class Repository {
     // Write index to tree
     writeTree() {
         const tree = new Tree(this.generateId());
-        /*this.index.getEntries().forEach(entry => {
+        this.index.getEntries().forEach(entry => {
             tree.addEntry(entry);
-        });*/
+        });
         const treeHash = tree.createTreeHash(this.readIndex());
-        this.commit(
+        /*this.commit(
             "add commit hash object creator method",
             treeHash as string
         );
-
+      */
         console.log("Tree written from index. : ", treeHash);
         return treeHash;
     }

@@ -7,12 +7,15 @@ import { Entry } from "./Entry";
 import { getFileMode } from "../utils/utils";
 import { EntryType } from "../types";
 
-export class Tree {
+import { Common } from "./Common";
+
+export class Tree /*extends Common */ {
     private id: string;
     private entries: Entry[] = [];
     private fs: FileAdapter;
 
     constructor(id: string) {
+        // super();
         this.id = id;
         this.fs = FsFileAdapter.getInstace();
     }
@@ -26,8 +29,9 @@ export class Tree {
     }
 
     createTreeHash(entries: EntryType<number>[]) {
-        console.log(entries);
+        //console.log(entries);
         const dirStructure = this.createCompleteStructure(entries);
+        console.log(dirStructure);
         const [hash, content] = this.computeTreeHash(dirStructure, true);
 
         console.log(hash);
@@ -83,7 +87,13 @@ export class Tree {
 
     computeTreeHash(
         dirTree: {
-            [key: string]: { name: string; mode: number; sha1: string } | any;
+            [key: string]:
+                | {
+                      name: string;
+                      mode: number;
+                      sha1: string;
+                  }
+                | any;
         },
         isRoot: boolean = false
     ) {
@@ -119,12 +129,22 @@ export class Tree {
         });
 
         const directoryHash = this.combineHashes(hashes);
+        /*this.hashObjct(
+            Buffer.concat(hashes),
+            "tree",
+            false
+        );*/
+        //console.log(directoryHash);
         return isRoot ? [directoryHash, hashes] : directoryHash;
     }
 
     parseTree(
         treeSh1: string,
-        entryList: { mode: string; fileName: string; sha1: string }[] = [],
+        entryList: {
+            mode: string;
+            fileName: string;
+            sha1: string;
+        }[] = [],
         nesteDir: string[] = []
     ) {
         const treeDir = treeSh1.slice(0, 2);
@@ -139,8 +159,6 @@ export class Tree {
 
         let entries = unCompressTree.slice(nullByte + 1);
 
-        //let entryList = [];
-
         while (entries.length) {
             const [mode, fileName] = entries
                 .slice(0, entries.indexOf("\x00"))
@@ -149,14 +167,14 @@ export class Tree {
             entries = entries.slice(entries.indexOf("\x00") + 1);
             const sha1 = entries.slice(0, 20);
 
-            const entLen = entries.indexOf("\x00") + 22;
             if (mode == "40000")
                 entryList = [
                     ...entryList,
-                    ...this.parseTree(sha1.toString("hex"), [], [
-                        ...nesteDir,
-                        fileName
-                    ])
+                    ...this.parseTree(
+                        sha1.toString("hex"),
+                        [],
+                        [...nesteDir, fileName]
+                    )
                 ];
             else
                 entryList.push({
