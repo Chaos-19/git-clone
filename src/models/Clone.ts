@@ -2,6 +2,9 @@ import { Common, OBJTYPE } from "./Common";
 import { createInflate } from "zlib";
 import { PassThrough, pipeline } from "stream";
 
+import path from "path";
+import { readFile } from "fs/promises";
+
 const OBJTYPE = {
     1: "OBJ_COMMIT",
     2: "OBJ_TREE",
@@ -12,6 +15,13 @@ const OBJTYPE = {
 };
 
 const GITOBJS = ["commit", "tree", "blob"];
+
+type UNPACKEDOBJTYPE = {
+    sha1?: string;
+    content: Buffer;
+    baseRef?: string;
+    type: OBJTYPE;
+};
 
 class Clone extends Common {
     url: string;
@@ -96,7 +106,11 @@ class Clone extends Common {
                 readOffset
             );
 
-            if (GITOBJS.includes(OBJTYPE[type])) {
+            console.log({ parsedBytes, type, size });
+
+            if (
+                ["OBJ_COMMIT", "OBJ_TREE", "OBJ_BLOB"].includes(OBJTYPE[type])
+            ) {
                 readOffset += parsedBytes;
 
                 const { decompressedData, parsedBytes: actualSize } =
@@ -104,6 +118,8 @@ class Clone extends Common {
                         packedObject.slice(readOffset),
                         size
                     );
+
+                console.log(decompressedData.toString());
 
                 readOffset += actualSize;
 
@@ -117,10 +133,9 @@ class Clone extends Common {
                     content: decompressedData
                 });
             } else if (type == 7) {
-                const baseRef = unpackedObject.slice(
-                    readOffset,
-                    readOffset + 20
-                );
+                const baseRef = unpackedObject
+                    .slice(readOffset, readOffset + 20)
+                    .toString("hex");
 
                 readOffset += 20 + parsedBytes;
 
@@ -215,6 +230,67 @@ class Clone extends Common {
         );
     }
 
+    async resolveDeltaObjects(
+        deltaobjects: UNPACKEDOBJTYPE[],
+        unpckedObjects: UNPACKEDOBJTYPE[]
+    ) {
+        let result = [];
+
+        for (let delta of deltaobjects) {
+            let resolveDelta = Buffer.alloc(0);
+
+            const instructuons = delta.content;
+
+            const baseObj = unpckedObjects.find(
+                value => value.ref == delta.baseRef
+            );
+
+            let currentPosition = 0;
+
+            const { sourceLength, targetLength, offset } =
+                this.decodeDeltaHeader(instructuons);
+
+            currentPosition += offset;
+
+            while (currentPosition < instractions.length) {
+                if (instractions[currentPosition] <= 127) {
+                    const {
+                        parsedBytes,
+                        offset: offseInsert,
+                        size
+                    } = this.parseInsert(instractions, currentPosition);
+
+                    resolveDelta = Buffer.concat([
+                        resolveDelta,
+                        instructions.slice(offseInsert, offseInsert + size)
+                    ]);
+
+                    currentPosition += parsedBytes + size;
+                } else if (instructions[i] > 127 && instructions[i] < 256) {
+                    const {
+                        parsedBytes,
+                        offset: offsetCopy,
+                        size
+                    } = this.parseCopy(instractions, currentPosition);
+
+                    resolveDelta = Buffer.concat([
+                        resolveDelta,
+                        baseObj.content.slice(offsetCopy, offsetCopy + size)
+                    ]);
+
+                    currentPosition += parsedBytes;
+                }
+            }
+
+            result.push({
+                sha1: this.hashObjct(resolveDelta, baseObj.type, false),
+                content: resolveDelta,
+                type: baseObj.type
+            });
+        }
+        return result;
+    }
+
     decodeDeltaHeader(instractions: Buffer) {
         let offset = 0;
 
@@ -267,21 +343,107 @@ class Clone extends Common {
         };
     }
 
+    parseCopy(
+        data: Buffer,
+        offset: number
+    ): {
+        parsedBytes: number;
+        offset: number;
+        size: number;
+    } {
+        const mask = data[offset]; // The mask byte indicates which offset/size bytes are set
+        let parsedBytes = 1; // Track the number of bytes read
+        offset++; // Move past the mask byte
+
+        // Arrays to hold the bytes for offset and size calculations
+        let offsetBytes = [];
+        let sizeBytes = [];
+
+        // Read offset bytes based on bits 0-3 of the mask
+        for (let i = 0; i < 4; i++) {
+            // First 4 bits for offset
+            if (mask & (1 << i)) {
+                offsetBytes.push(data[offset]);
+                offset++;
+                parsedBytes++;
+            } else {
+                offsetBytes.push(0); // If bit not set, assume zero for this byte
+            }
+        }
+
+        // Read size bytes based on bits 4-6 of the mask
+        for (let i = 4; i < 7; i++) {
+            // Next 3 bits for size
+            if (mask & (1 << i)) {
+                sizeBytes.push(data[offset]);
+                offset++;
+                parsedBytes++;
+            } else {
+                sizeBytes.push(0); // If bit not set, assume zero for this byte
+            }
+        }
+
+        // Calculate the actual offset value from the bytes (little-endian order)
+        let offsetValue = offsetBytes.reduce(
+            (acc, byte, index) => acc + (byte << (index * 8)),
+            0
+        );
+
+        // Calculate the actual size value from the bytes (little-endian order)
+        let sizeValue = sizeBytes.reduce(
+            (acc, byte, index) => acc + (byte << (index * 8)),
+            0
+        );
+
+        // Special case: if size is zero, it means copy 0x10000 (65536) bytes
+        if (sizeValue === 0) {
+            sizeValue = 0x10000;
+        }
+
+        return { parsedBytes, offset: offsetValue, size: sizeValue };
+    }
+
+    parseInsert(
+        data: Buffer,
+        offset: number
+    ): {
+        parsedBytes: number;
+        offset: number;
+        size: number;
+    } {
+        const size = data[offset];
+        const parsedBytes = 1;
+        return { parsedBytes, offset: offset + parsedBytes, size };
+    }
+
+    async fetchPack() {
+        return await readFile(path.join("test/", "pack.file"));
+        //return await readFile(path.join(__dirname, "AngularBlogApp.pack"))
+    }
     cloneRepo() {
-        this.getAvalableRefFromServer()
+        /*this.getAvalableRefFromServer()
             .then(ref => this.extractRefHash(ref))
             .then(({ ref, hash }: { ref: string; hash: string }) =>
                 this.getPackFile(hash)
-            )
+            )*/
+        this.fetchPack()
             .then(res => this.parsePackFile(Buffer.from(res)))
             .then(unpacked => {
+                const deltas = unpacked.filter(v => v?.type == "OBJ_REF_DELTA");
+                const objUNPacked = unpacked.filter(
+                    v => v?.type !== "OBJ_REF_DELTA"
+                );
+
+                return this.resolveDeltaObjects(deltas, objUNPacked);
+            })
+            .then(resolv =>
                 console.log(
-                    unpacked.map(value => ({
+                    resolv.map(value => ({
                         ...value,
                         contentS: value.content.toString()
                     }))
-                );
-            })
+                )
+            )
             .catch(error => console.log(error));
     }
 }
