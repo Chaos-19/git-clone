@@ -93,15 +93,15 @@ class Clone extends Common {
         for (let index = 0; index < objectLength; index++) {
             const { parsedBytes, type, size } = this.parsePackObjectHeader(
                 packedObject,
-                offset
+                readOffset
             );
 
             if (GITOBJS.includes(OBJTYPE[type])) {
                 readOffset += parsedBytes;
 
                 const { decompressedData, parsedBytes: actualSize } =
-                    await inflateWithLengthLimit(
-                        packedObj.slice(readOffset),
+                    await this.inflateWithLengthLimit(
+                        packedObject.slice(readOffset),
                         size
                     );
 
@@ -125,8 +125,8 @@ class Clone extends Common {
                 readOffset += 20 + parsedBytes;
 
                 const { decompressedData, parsedBytes: actualSize } =
-                    await inflateWithLengthLimit(
-                        packedObj.slice(readOffset),
+                    await this.inflateWithLengthLimit(
+                        packedObject.slice(readOffset),
                         size
                     );
 
@@ -220,12 +220,12 @@ class Clone extends Common {
 
         // Read the source length
         const { length: sourceLength, bytesRead: sourceBytes } =
-            readVariableLengthInt(instractions, offset);
+            this.readVariableLengthInt(instractions, offset);
         offset += sourceBytes;
 
         // Read the target length
         const { length: targetLength, bytesRead: targetBytes } =
-            readVariableLengthInt(instractions, offset);
+            this.readVariableLengthInt(instractions, offset);
         offset += targetBytes;
 
         return {
@@ -273,7 +273,7 @@ class Clone extends Common {
             .then(({ ref, hash }: { ref: string; hash: string }) =>
                 this.getPackFile(hash)
             )
-            .then(res => this.parsePackFile(res))
+            .then(res => this.parsePackFile(Buffer.from(res)))
             .then(unpacked => {
                 console.log(
                     unpacked.map(value => ({
