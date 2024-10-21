@@ -21,7 +21,7 @@ export class Commit {
         this.treeHash = treeHash;
         this.parent = parent;
         this.author = author;
-        this.timestamp = new Date();
+        //this.timestamp = new Date();
         this.message = message;
     }
 
@@ -33,6 +33,7 @@ export class Commit {
       const parentCommit = this.fs
         this.parent;
     }*/
+    
     getParent(): string {
         return this.parent;
     }
@@ -41,8 +42,26 @@ export class Commit {
         return this.author;
     }
 
-    getTimestamp(): Date {
-        return this.timestamp;
+    getTimestamp(): string {
+        const now = new Date();
+        const timestamp = Math.floor(now.getTime() / 1000); // Convert milliseconds to seconds
+
+        // Get timezone offset in minutes
+        const offsetMinutes = now.getTimezoneOffset();
+
+        // Calculate hours and minutes for the offset
+        const offsetHours = Math.floor(Math.abs(offsetMinutes) / 60);
+        const offsetRemainingMinutes = Math.abs(offsetMinutes) % 60;
+
+        // Format the offset with leading zeroes if needed
+        const formattedOffset = `${offsetMinutes > 0 ? "-" : "+"}${String(
+            offsetHours
+        ).padStart(2, "0")}${String(offsetRemainingMinutes).padStart(2, "0")}`;
+
+        // Combine timestamp with offset
+        const formattedTime = `${timestamp} ${formattedOffset}`;
+        //console.log(formattedTime);
+        return formattedTime;
     }
 
     getMessage(): string {
@@ -53,22 +72,26 @@ export class Commit {
         const commitInfo = [];
         commitInfo.push(`tree ${this.treeHash}`);
         if (this.parent !== "") commitInfo.push(`parent ${this.parent}`);
+
+        const timestamp = this.getTimestamp();
+
         commitInfo.push(
-            `author ${this.author.getUsername()} <${this.author.getEmail()}> 1729164823 +0300`
+            `author ${this.author.getUsername()} <${this.author.getEmail()}> ${timestamp}`
         );
         commitInfo.push(
-            `committer ${this.author.getUsername()} <${this.author.getEmail()}> 1729164823 +0300`
+            `committer ${this.author.getUsername()} <${this.author.getEmail()}> ${timestamp}`
         );
         commitInfo.push(``);
         commitInfo.push(this.message);
         commitInfo.push(``);
 
-        console.log(commitInfo.join("\n"));
         const rawFileContent = Buffer.from(commitInfo.join("\n"), "utf-8");
-        const header = Buffer.from(`commit ${rawFileContent.length}\0`);
+        /*const header = Buffer.from(`commit ${rawFileContent.length}\0`);
         const store = Buffer.concat([header, rawFileContent]);
 
         const SHA = crypto.createHash("sha1").update(store).digest("hex");
+        */
+
         return SHA;
     }
 }

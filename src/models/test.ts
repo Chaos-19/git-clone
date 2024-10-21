@@ -17,8 +17,8 @@ const repo = new Repository(
 repo.add("TODO.md");
  */
 //console.log(repo. );
-//repo.writeTree();
+repo.writeTree();
 /*repo.writeIndex();
 console.log(repo.readIndex());
- */
 repo.commit("add parse tree method", repo.writeTree());
+ */

@@ -62,7 +62,7 @@ export class Repository {
             const header = Buffer.from(`blob ${this.fs.statSync(file).size}\0`);
             const store = Buffer.concat([header, rawFileContent]);
 
-            const SHA = this.hashObject(file);
+            const SHA = ""; //this.hashObject(file);
 
             const compressBlob = zlib.deflateSync(store);
 
@@ -125,12 +125,13 @@ export class Repository {
         this.index.getEntries().forEach(entry => {
             tree.addEntry(entry);
         });
-        const treeHash = tree.createTreeHash(this.readIndex());
+        const treeHash: string = tree.createTreeHash(this.readIndex());
         /*this.commit(
             "add commit hash object creator method",
             treeHash as string
         );
       */
+
         console.log("Tree written from index. : ", treeHash);
         return treeHash;
     }
@@ -155,7 +156,7 @@ export class Repository {
         const newCommit = new Commit(
             treeHah,
             this.generateId(),
-            "eb59cc2f788983db59e35dcbbd11409e5d58d1f4",
+            "4e6f04a63d5340cc7989cd06063e0a8898f83d00",
             new Author(null, "Chaos-19", "kalgetachew375@gmail.com"),
             message
         );
@@ -173,31 +174,6 @@ export class Repository {
     // Checkout a specific commit
     checkout(commitId: string): void {
         console.log(`Checked out commit ${commitId}`);
-    }
-
-    // Hash file content (to simulate hash-object)
-    hashObject(file: string): string {
-        const rawFileDir = file;
-
-        const rawFileContent = this.fs.readFileSync(rawFileDir);
-        const header = Buffer.from(
-            `blob ${this.fs.statSync(rawFileDir).size}\0`
-        );
-        const store = Buffer.concat([header, rawFileContent]);
-
-        const SHA = crypto.createHash("sha1").update(store).digest("hex");
-
-        /*const compressBlob = zlib.deflateSync(store);
-
-        fs.mkdirSync(`.git/objects/${SHA.slice(0, 2)}`, {
-            recursive: true
-        });
-        const path = `.git/objects/${SHA.slice(0, 2)}/${SHA.slice(2)}`;
-
-        fs.writeFileSync(path, compressBlob);
-
-        process.stdout.write(SHA);*/
-        return SHA;
     }
 
     // Generate unique ID for tree, commit, etc.

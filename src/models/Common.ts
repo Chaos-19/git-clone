@@ -4,9 +4,9 @@ import zlib from "zlib";
 
 import { FileAdapter, FsFileAdapter } from "../adapters/FsFileAdapter";
 
-type OBJTYPE = "commit" | "blob" | "tree";
+export type OBJTYPE = "commit" | "blob" | "tree";
 
-export class Common {
+export  class Common {
     fs: FileAdapter; // = FsFileAdapter.getInstace();
 
     constructor() {

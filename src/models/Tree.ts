@@ -9,15 +9,15 @@ import { EntryType } from "../types";
 
 import { Common } from "./Common";
 
-export class Tree /*extends Common */ {
+export class Tree extends Common {
     private id: string;
     private entries: Entry[] = [];
-    private fs: FileAdapter;
+    //private fs: FileAdapter;
 
     constructor(id: string) {
-        // super();
+        super();
         this.id = id;
-        this.fs = FsFileAdapter.getInstace();
+        //this.fs = FsFileAdapter.getInstace();
     }
 
     addEntry(entry: Entry): void {
@@ -28,19 +28,14 @@ export class Tree /*extends Common */ {
         return this.entries;
     }
 
-    createTreeHash(entries: EntryType<number>[]) {
-        //console.log(entries);
+    createTreeHash(entries: EntryType<number>[]): string {
         const dirStructure = this.createCompleteStructure(entries);
-        console.log(dirStructure);
         const [hash, content] = this.computeTreeHash(dirStructure, true);
 
-        console.log(hash);
-        console.log(content);
-
-        return hash;
+        return hash as string;
     }
 
-    createCompleteStructure(arr: EntryType<number>[]) {
+    createCompleteStructure(arr: Partial<EntryType<number>>[]) {
         const result = {};
 
         arr.forEach(dir => {
@@ -48,7 +43,12 @@ export class Tree /*extends Common */ {
             let current = result;
 
             dirs.forEach(part => {
-                if (/(\w+\.+\w+)|(^\.\w+)/.test(part)) {
+                if (
+                    /(\w+\.+\w+)|(^\.\w+)/.test(part) ||
+                    (this.fs.existsSync(path.join(part))
+                        ? this.fs.statSync(path.join(part)).isFile()
+                        : false)
+                ) {
                     current[part] = {
                         name: dir.path.split("/").pop(),
                         //get the mode by checking the actual file
@@ -68,21 +68,6 @@ export class Tree /*extends Common */ {
         });
 
         return result;
-    }
-    combineHashes(hashes: Buffer[]) {
-        const entriesBuffer = Buffer.concat(hashes);
-
-        const treeHeader = Buffer.from(
-            `tree ${Buffer.byteLength(entriesBuffer)}\0`
-        );
-        const treeContent = Buffer.concat([treeHeader, entriesBuffer]);
-
-        const treeHash = crypto
-            .createHash("sha1")
-            .update(treeContent)
-            .digest("hex");
-
-        return treeHash;
     }
 
     computeTreeHash(
@@ -119,7 +104,10 @@ export class Tree /*extends Common */ {
 
         hashes = hashes.map((entr, index) => {
             if (
-                !/(\w+\.+\w+)|(^\.\w+)/.test(Object.entries(dirTree)[index][0])
+                !/(\w+\.+\w+)|(^\.\w+)/.test(
+                    Object.entries(dirTree)[index][0]
+                ) &&
+                Object.entries(dirTree)[index][1].mode !== "100644"
             ) {
                 return Buffer.concat([
                     Buffer.from(`40000 ${Object.entries(dirTree)[index][0]}\0`),
@@ -128,21 +116,19 @@ export class Tree /*extends Common */ {
             } else return entr;
         });
 
-        const directoryHash = this.combineHashes(hashes);
-        /*this.hashObjct(
+        const directoryHash = this.hashObjct(
             Buffer.concat(hashes),
             "tree",
             false
-        );*/
-        //console.log(directoryHash);
+        );
         return isRoot ? [directoryHash, hashes] : directoryHash;
     }
 
     parseTree(
         treeSh1: string,
         entryList: {
-            mode: string;
-            fileName: string;
+            mode: number;
+            path: string;
             sha1: string;
         }[] = [],
         nesteDir: string[] = []
@@ -178,8 +164,8 @@ export class Tree /*extends Common */ {
                 ];
             else
                 entryList.push({
-                    mode,
-                    fileName:
+                    mode: parseInt(mode),
+                    path:
                         (!nesteDir.length ? "" : `${nesteDir.join("/")}/`) +
                         fileName,
                     sha1: sha1.toString("hex")

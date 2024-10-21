@@ -1,0 +1,411 @@
+
+> git-node@1.0.0 dev-c
+> ts-node src/models/Clone.ts
+
+........parseObj result.......
+[
+  {
+    sha1: 'f0eef7bbe5799d43f6145466bf28f9d45a724117',
+    type: 'OBJ_COMMIT',
+    content: <Buffer 74 72 65 65 20 65 33 39 39 30 34 33 37 39 30 63 32 33 36 61 66 36 32 62 34 38 39 39 64 39 62 62 65 37 62 65 61 32 66 31 65 35 62 36 39 0a 70 61 72 65 ... 182 more bytes>,
+    contentS: 'tree e399043790c236af62b4899d9bbe7bea2f1e5b69\n' +
+      'parent 45a1e04b96aed756d5b215fa3ce595bffc0581a5\n' +
+      'author Chaos-19 <kalgetachew375@gmail.com> 1725599148 +0300\n' +
+      'committer Chaos-19 <kalgetachew375@gmail.com> 1725599148 +0300\n' +
+      '\n' +
+      'add README.md\n'
+  },
+  {
+    sha1: '45a1e04b96aed756d5b215fa3ce595bffc0581a5',
+    type: 'OBJ_COMMIT',
+    content: <Buffer 74 72 65 65 20 34 32 62 31 31 37 37 61 31 35 36 33 31 33 61 32 66 62 35 32 32 39 61 36 61 38 39 32 63 30 65 62 65 38 33 30 63 66 34 30 0a 61 75 74 68 ... 132 more bytes>,
+    contentS: 'tree 42b1177a156313a2fb5229a6a892c0ebe830cf40\n' +
+      'author Chaos-19 <kalgetachew375@gmail.com> 1725453043 +0300\n' +
+      'committer Chaos-19 <kalgetachew375@gmail.com> 1725453043 +0300\n' +
+      '\n' +
+      'init commit\n'
+  },
+  {
+    sha1: 'e399043790c236af62b4899d9bbe7bea2f1e5b69',
+    type: 'OBJ_TREE',
+    content: <Buffer 31 30 30 36 34 34 20 52 45 41 44 4d 45 2e 6d 64 00 d8 e2 02 d9 aa 96 7f 9a 16 e2 bc 69 98 a4 5f eb a6 c8 1a 0b 34 30 30 30 30 20 67 69 74 69 67 6e 6f ... 79 more bytes>,
+    contentS: '100644 README.md\x00��\x02٪�\x7F�\x16�i��_��\x1A\x0B40000 gitignore_generator\x00>�k�\x15�$d�۶��+��l�XP100755 register_script.sh\x00#=M��bj��IW\x00c��@�\x15B"'
+  },
+  {
+    sha1: 'd8e202d9aa967f9a16e2bc6998a45feba6c81a0b',
+    type: 'OBJ_BLOB',
+    content: <Buffer 23 20 54 65 72 6d 75 78 20 41 75 74 6f 6d 61 74 69 6f 6e 20 53 63 72 69 70 74 73 0a 0a 54 68 69 73 20 72 65 70 6f 73 69 74 6f 72 79 20 63 6f 6e 74 61 ... 2126 more bytes>,
+    contentS: '# Termux Automation Scripts\n' +
+      '\n' +
+      'This repository contains a collection of bash scripts that automate various tasks in the Termux terminal environment. These scripts are designed to simplify repetitive tasks, making Termux usage more efficient.\n' +
+      '\n' +
+      '## Features\n' +
+      '\n' +
+      '- **Bash Script Registration**: Automate the process of registering and setting up bash scripts for easy global access.\n' +
+      '- **`.gitignore` Generator**: Quickly generate a `.gitignore` file for different languages and frameworks.\n' +
+      '- **Additional Automations**: More scripts for common tasks in Termux will be added over time.\n' +
+      '\n' +
+      '## Installation\n' +
+      '\n' +
+      '1. Clone the repository to your Termux environment:\n' +
+      '\n' +
+      '   ```bash\n' +
+      '   git clone https://github.com/Chaos-19/termux-scripts.git\n' +
+      '   cd termux-scripts\n' +
+      '   ```\n' +
+      '\n' +
+      '2. Make sure the scripts are executable:\n' +
+      '\n' +
+      '   ```bash\n' +
+      '   chmod +x *.sh\n' +
+      '   ```\n' +
+      '\n' +
+      '3. Add the repository to your `PATH` to access the scripts globally:\n' +
+      '\n' +
+      '   ```bash\n' +
+      `   echo 'export PATH="$HOME/termux-scripts:$PATH"' >> ~/.bashrc\n` +
+      '   source ~/.bashrc\n' +
+      '   ```\n' +
+      '\n' +
+      '4. Now you can run the scripts from anywhere in Termux.\n' +
+      '\n' +
+      '## Available Scripts\n' +
+      '\n' +
+      '### 1. Bash Script Registration (`register-script.sh`)\n' +
+      '\n' +
+      'This script automates the process of making a bash script globally accessible in the Termux environment by adding it to your `$PATH` and ensuring it is executable.\n' +
+      '\n' +
+      '#### Usage:\n' +
+      '\n' +
+      '```bash\n' +
+      './register-script.sh /path/to/your-script.sh\n' +
+      '```\n' +
+      '\n' +
+      'This will:\n' +
+      '- Ensure the script is executable.\n' +
+      "- Add the script's directory to the global `$PATH`.\n" +
+      '\n' +
+      '### 2. `.gitignore` Generator (`generate-gitignore.sh`)\n' +
+      '\n' +
+      'Automatically generate a `.gitignore` file tailored for a specific language or framework.\n' +
+      '\n' +
+      '#### Usage:\n' +
+      '\n' +
+      '```bash\n' +
+      './generate-gitignore.sh nodejs  # For a Node.js project\n' +
+      '```\n' +
+      '\n' +
+      'The script will fetch the appropriate `.gitignore` template and save it to your current working directory.\n' +
+      '\n' +
+      '### 3. Custom Scripts\n' +
+      '\n' +
+      'This section will be updated as more scripts are added.\n' +
+      '\n' +
+      '## Contributing\n' +
+      '\n' +
+      "Feel free to submit a pull request if you have a useful automation script you'd like to add. Make sure to include documentation for your script in the `README.md`.\n" +
+      '\n' +
+      '## License\n' +
+      '\n' +
+      'This repository is licensed under the MIT License. See the `LICENSE` file for more information.\n'
+  },
+  {
+    sha1: '3ef26b8215a72464b8dbb6fcee2baf826c905850',
+    type: 'OBJ_TREE',
+    content: <Buffer 31 30 30 36 34 34 20 64 6a 61 6e 67 6f 2e 67 69 74 69 67 6e 6f 72 65 00 c0 dc 96 84 af 5e fd 78 52 b7 e4 dc 2b 4c bf be e7 ab a6 61 31 30 30 36 34 34 ... 166 more bytes>,
+    contentS: '100644 django.gitignore\x00�ܖ��^�xR���+L��竦a100644 flask.gitignore\x00��\x0E�����\x05\x19� 3U,�\x02100755 gene.gitignore.sh\x00"\x14��!\x1A�\x1F\x05�k\x1B&��ݷ\x1F^�100644 java.gitignore\x00�y:��YG���3��\x1E?�B�100644 node.gitignore\x00�$v\x16��­w7gqA<��x\b�]'
+  },
+  {
+    sha1: 'c0dc9684af5efd7852b7e4dc2b4cbfbee7aba661',
+    type: 'OBJ_BLOB',
+    content: <Buffer 23 20 42 79 74 65 2d 63 6f 6d 70 69 6c 65 64 20 2f 20 6f 70 74 69 6d 69 7a 65 64 20 2f 20 44 4c 4c 20 66 69 6c 65 73 0a 5f 5f 70 79 63 61 63 68 65 5f ... 719 more bytes>,
+    contentS: '# Byte-compiled / optimized / DLL files\n' +
+      '__pycache__/\n' +
+      '*.py[cod]\n' +
+      '*$py.class\n' +
+      '\n' +
+      '# C extensions\n' +
+      '*.so\n' +
+      '\n' +
+      '# Distribution / packaging\n' +
+      '.Python\n' +
+      'env/\n' +
+      'venv/\n' +
+      'ENV/\n' +
+      'build/\n' +
+      'develop-eggs/\n' +
+      'dist/\n' +
+      'downloads/\n' +
+      'eggs/\n' +
+      '.eggs/\n' +
+      'lib/\n' +
+      'lib64/\n' +
+      'parts/\n' +
+      'sdist/\n' +
+      'var/\n' +
+      'wheels/\n' +
+      '*.egg-info/\n' +
+      '.installed.cfg\n' +
+      '*.egg\n' +
+      '\n' +
+      '# Django stuff:\n' +
+      '*.log\n' +
+      '*.pot\n' +
+      '*.pyc\n' +
+      'local_settings.py\n' +
+      'db.sqlite3\n' +
+      'db.sqlite3-journal\n' +
+      '\n' +
+      '# Media files\n' +
+      'media/\n' +
+      '\n' +
+      '# Static files\n' +
+      'staticfiles/\n' +
+      '\n' +
+      '# Translations\n' +
+      '*.mo\n' +
+      '\n' +
+      '# Django secret key\n' +
+      '.secret\n' +
+      '\n' +
+      '# dotenv\n' +
+      '.env\n' +
+      '\n' +
+      '# PyInstaller\n' +
+      '*.manifest\n' +
+      '*.spec\n' +
+      '\n' +
+      '# Installer logs\n' +
+      'pip-log.txt\n' +
+      'pip-delete-this-directory.txt\n' +
+      '\n' +
+      '# Unit test / coverage reports\n' +
+      'htmlcov/\n' +
+      '.tox/\n' +
+      '.nox/\n' +
+      '.coverage\n' +
+      '.coverage.*\n' +
+      '.cache\n' +
+      'nosetests.xml\n' +
+      'coverage.xml\n' +
+      '*.cover\n' +
+      '*.py,cover\n' +
+      '.hypothesis/\n' +
+      '.pytest_cache/\n' +
+      '\n' +
+      '# MyPy\n' +
+      '.mypy_cache/\n' +
+      '\n' +
+      '# IDE files\n' +
+      '.vscode/\n' +
+      '.idea/\n' +
+      '\n'
+  },
+  {
+    sha1: '2214fab6211ace1f059a6b1b26b5e5ddb71f5e92',
+    type: 'OBJ_BLOB',
+    content: <Buffer 23 21 2f 62 69 6e 2f 62 61 73 68 0a 0a 73 63 72 69 70 74 5f 64 69 72 3d 24 28 64 69 72 6e 61 6d 65 20 22 24 30 22 29 0a 63 75 72 72 65 6e 74 5f 77 6f ... 997 more bytes>,
+    contentS: '#!/bin/bash\n' +
+      '\n' +
+      'script_dir=$(dirname "$0")\n' +
+      'current_working_dir=$(pwd)\n' +
+      'FILE_NAME="${current_working_dir}/.gitignore"\n' +
+      '\n' +
+      '#content=$(cat "node.gitignore")\n' +
+      'echo "$script_dir"\n' +
+      '\n' +
+      'case "$1" in \n' +
+      '    node | nodejs) \n' +
+      '        #cat node.gitignore\n' +
+      '        content=$(cat "${script_dir}/node.gitignore")\n' +
+      '        echo "$content" > $FILE_NAME\n' +
+      '        echo "$FILE_NAME is successfully created for Node.js project"\n' +
+      '        ;;\n' +
+      '    flask)\n' +
+      '        content=$(cat "${script_dir}/flask.gitignore")\n' +
+      '        echo "$content" > $FILE_NAME\n' +
+      '        echo "$FILE_NAME is successfully created for Flask project"\n' +
+      '        ;;\n' +
+      '    django)\n' +
+      '        content=$(cat "${script_dir}/django.gitignore")\n' +
+      '        echo "$content" > $FILE_NAME\n' +
+      '        echo "$FILE_NAME is successfully created for Django project"\n' +
+      '        ;;\n' +
+      '    java | springboot)\n' +
+      '        content=$(cat "${script_dir}/java.gitignore")\n' +
+      '        echo "$content" > $FILE_NAME\n' +
+      '        echo "$FILE_NAME is successfully created for Java project"\n' +
+      '        ;;\n' +
+      '    *) \n' +
+      '        echo "Usage: $0 {node|flask|django|java|springboot}" \n' +
+      '        ;; \n' +
+      'esac\n'
+  },
+  {
+    sha1: '92793aa8875947e289ed92d6338de91e3fad42f4',
+    type: 'OBJ_BLOB',
+    content: <Buffer 23 23 23 20 4a 61 76 61 20 23 23 23 0a 23 20 43 6f 6d 70 69 6c 65 64 20 63 6c 61 73 73 20 66 69 6c 65 0a 2a 2e 63 6c 61 73 73 0a 0a 23 20 4c 6f 67 20 ... 681 more bytes>,
+    contentS: '### Java ###\n' +
+      '# Compiled class file\n' +
+      '*.class\n' +
+      '\n' +
+      '# Log file\n' +
+      '*.log\n' +
+      '\n' +
+      '# BlueJ files\n' +
+      '*.ctxt\n' +
+      '\n' +
+      '# Mobile Tools for Java (J2ME)\n' +
+      '.mtj.tmp/\n' +
+      '\n' +
+      '# Package Files #\n' +
+      '*.jar\n' +
+      '*.war\n' +
+      '*.ear\n' +
+      '\n' +
+      '# Virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml\n' +
+      'hs_err_pid*\n' +
+      '\n' +
+      '### Maven ###\n' +
+      'target/\n' +
+      'pom.xml.tag\n' +
+      'pom.xml.releaseBackup\n' +
+      'pom.xml.versionsBackup\n' +
+      'pom.xml.next\n' +
+      'release.properties\n' +
+      'dependency-reduced-pom.xml\n' +
+      'buildNumber.properties\n' +
+      '.mvn/timing.properties\n' +
+      '.mvn/wrapper/maven-wrapper.jar\n' +
+      '.mvn/wrapper/maven-wrapper.properties\n' +
+      '\n' +
+      '### Gradle ###\n' +
+      '.gradle/\n' +
+      'build/\n' +
+      '!gradle-wrapper.jar\n' +
+      '!gradle-wrapper.properties\n' +
+      '\n' +
+      '### Spring Boot ###\n' +
+      '### IntelliJ IDEA ###\n' +
+      '.idea/\n' +
+      '*.iws\n' +
+      '*.iml\n' +
+      '*.ipr\n' +
+      '\n' +
+      '### Eclipse ###\n' +
+      '.project\n' +
+      '.classpath\n' +
+      '.csettings/\n' +
+      '.settings/\n' +
+      'bin/\n' +
+      '\n'
+  },
+  {
+    sha1: 'f4247616a1a1c2ad77376771413ce1d978088b5d',
+    type: 'OBJ_BLOB',
+    content: <Buffer 23 20 4e 6f 64 65 2e 6a 73 0a 6e 6f 64 65 5f 6d 6f 64 75 6c 65 73 2f 0a 6e 70 6d 2d 64 65 62 75 67 2e 6c 6f 67 2a 0a 79 61 72 6e 2d 64 65 62 75 67 2e ... 481 more bytes>,
+    contentS: '# Node.js\n' +
+      'node_modules/\n' +
+      'npm-debug.log*\n' +
+      'yarn-debug.log*\n' +
+      'yarn-error.log*\n' +
+      '\n' +
+      '# Environment variables\n' +
+      '.env\n' +
+      '\n' +
+      '# Logs\n' +
+      'logs/\n' +
+      '*.log\n' +
+      'pids/\n' +
+      '*.pid\n' +
+      '*.seed\n' +
+      '*.pid.lock\n' +
+      '\n' +
+      '# Dependency directories\n' +
+      'node_modules/\n' +
+      'jspm_packages/\n' +
+      '\n' +
+      '# Optional npm cache directory\n' +
+      '.npm\n' +
+      '\n' +
+      '# Optional eslint cache\n' +
+      '.eslintcache\n' +
+      '\n' +
+      '# Coverage directory used by tools like istanbul\n' +
+      'coverage/\n' +
+      '*.lcov\n' +
+      '\n' +
+      '# Dist folder\n' +
+      'dist/\n' +
+      'build/\n' +
+      'out/\n' +
+      '\n' +
+      '# Directory for instrumented libs generated by jscoverage/JSCover\n' +
+      'lib-cov/\n' +
+      '\n' +
+      '# Optional REPL history\n' +
+      '.node_repl_history\n' +
+      '\n' +
+      '# IDE files\n' +
+      '.vscode/\n' +
+      '.idea/\n' +
+      '\n'
+  },
+  {
+    sha1: '233d4d85e6626ab1e4495700638ead40f2154222',
+    type: 'OBJ_BLOB',
+    content: <Buffer 23 21 2f 62 69 6e 2f 62 61 73 68 0a 0a 23 20 43 68 65 63 6b 20 69 66 20 61 6e 20 61 72 67 75 6d 65 6e 74 20 77 61 73 20 70 72 6f 76 69 64 65 64 0a 69 ... 900 more bytes>,
+    contentS: '#!/bin/bash\n' +
+      '\n' +
+      '# Check if an argument was provided\n' +
+      'if [[ -n "$1" ]]; then\n' +
+      '\n' +
+      '    # Resolve the full path of the script\n' +
+      '    script_path=$(realpath "$1")\n' +
+      '\n' +
+      '    # Check if the file exists\n' +
+      '    if [[ -e "$script_path" ]]; then\n' +
+      '        echo "File exists at $script_path!"\n' +
+      '\n' +
+      '        # Get the directory of the script\n' +
+      '        script_dir=$(dirname "$script_path")\n' +
+      '\n' +
+      '        # Append the directory to .bashrc if not already added\n' +
+      '        if ! grep -q "$script_dir" ~/.bashrc; then\n' +
+      '            echo "Adding $script_dir to PATH..."\n' +
+      '            echo "export PATH=\\"$script_dir:\\$PATH\\"" >> ~/.bashrc\n' +
+      '            source ~/.bashrc\n' +
+      '        else\n' +
+      '            echo "$script_dir is already in your PATH."\n' +
+      '        fi\n' +
+      '\n' +
+      '        # Make the script executable\n' +
+      '        chmod +x "$script_path"\n' +
+      '        echo "Script is now executable and globally accessible."\n' +
+      '\n' +
+      '    else\n' +
+      `        echo "Invalid path: The file doesn't exist!"\n` +
+      '    fi\n' +
+      'else\n' +
+      '    echo "Please provide the script file path!"\n' +
+      'fi\n'
+  },
+  {
+    sha1: '42b1177a156313a2fb5229a6a892c0ebe830cf40',
+    type: 'OBJ_TREE',
+    content: <Buffer 34 30 30 30 30 20 67 69 74 69 67 6e 6f 72 65 5f 67 65 6e 65 72 61 74 6f 72 00 3e f2 6b 82 15 a7 24 64 b8 db b6 fc ee 2b af 82 6c 90 58 50 31 30 30 37 ... 42 more bytes>,
+    contentS: '40000 gitignore_generator\x00>�k�\x15�$d�۶��+��l�XP100755 register_script.sh\x00#=M��bj��IW\x00c��@�\x15B"'
+  }
+]
+{
+  type: 'OBJ_REF_DELTA',
+  ref: <Buffer f4 12 c0 dc 96 84 af 5e fd 78 52 b7 e4 dc 2b 4c bf be e7 ab>,
+  content: <Buffer 81 06 d7 06 b0 11 01 7f 46 6c 61 73 6b 20 73 74 75 66 66 3a 0a 69 6e 73 74 61 6e 63 65 2f 0a 2e 77 65 62 61 73 73 65 74 73 2d 63 61 63 68 65 0a 0a 23 ... 242 more bytes>
+}
+
+{ sourceLength: 769, targetLength: 855, offset: 4 }
+TypeError: Cannot read properties of undefined (reading 'length')
+    at Function.concat (node:buffer:586:19)
+    at Clone.resolveDeltaObjects (/data/data/com.termux/files/home/backend/git-node/src/models/Clone.ts:190:44)
+    at /data/data/com.termux/files/home/backend/git-node/src/models/Clone.ts:441:29
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
