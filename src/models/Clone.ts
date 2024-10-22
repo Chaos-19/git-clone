@@ -106,20 +106,18 @@ class Clone extends Common {
                 readOffset
             );
 
-            console.log({ parsedBytes, type, size });
+            readOffset += parsedBytes;
 
             if (
                 ["OBJ_COMMIT", "OBJ_TREE", "OBJ_BLOB"].includes(OBJTYPE[type])
             ) {
-                readOffset += parsedBytes;
-
                 const { decompressedData, parsedBytes: actualSize } =
                     await this.inflateWithLengthLimit(
                         packedObject.slice(readOffset),
                         size
                     );
 
-                console.log(decompressedData.toString());
+                //console.log(decompressedData.toString());
 
                 readOffset += actualSize;
 
@@ -132,12 +130,15 @@ class Clone extends Common {
                     type: OBJTYPE[type],
                     content: decompressedData
                 });
+
+                console.log(<OBJTYPE>GITOBJS[type - 1]);
+                console.log({ type });
             } else if (type == 7) {
-                const baseRef = unpackedObject
+                const baseRef = packedObject
                     .slice(readOffset, readOffset + 20)
                     .toString("hex");
-
-                readOffset += 20 + parsedBytes;
+                console.log(baseRef);
+                readOffset += 20;
 
                 const { decompressedData, parsedBytes: actualSize } =
                     await this.inflateWithLengthLimit(
@@ -239,26 +240,28 @@ class Clone extends Common {
         for (let delta of deltaobjects) {
             let resolveDelta = Buffer.alloc(0);
 
-            const instructuons = delta.content;
+            const instructions = delta.content;
+
+            console.log(delta);
 
             const baseObj = unpckedObjects.find(
-                value => value.ref == delta.baseRef
+                value => value.sha1 == delta.baseRef
             );
-
+            console.log(baseObj);
             let currentPosition = 0;
 
             const { sourceLength, targetLength, offset } =
-                this.decodeDeltaHeader(instructuons);
+                this.decodeDeltaHeader(instructions);
 
             currentPosition += offset;
 
-            while (currentPosition < instractions.length) {
-                if (instractions[currentPosition] <= 127) {
+            while (currentPosition < instructions.length) {
+                if (instructions[currentPosition] <= 127) {
                     const {
                         parsedBytes,
                         offset: offseInsert,
                         size
-                    } = this.parseInsert(instractions, currentPosition);
+                    } = this.parseInsert(instructions, currentPosition);
 
                     resolveDelta = Buffer.concat([
                         resolveDelta,
@@ -266,12 +269,15 @@ class Clone extends Common {
                     ]);
 
                     currentPosition += parsedBytes + size;
-                } else if (instructions[i] > 127 && instructions[i] < 256) {
+                } else if (
+                    instructions[currentPosition] > 127 &&
+                    instructions[currentPosition] < 256
+                ) {
                     const {
                         parsedBytes,
                         offset: offsetCopy,
                         size
-                    } = this.parseCopy(instractions, currentPosition);
+                    } = this.parseCopy(instructions, currentPosition);
 
                     resolveDelta = Buffer.concat([
                         resolveDelta,
@@ -433,6 +439,13 @@ class Clone extends Common {
                 const objUNPacked = unpacked.filter(
                     v => v?.type !== "OBJ_REF_DELTA"
                 );
+
+                /*console.log(
+                    unpacked.map(value => ({
+                        ...value,
+                        contentS: value.content.toString()
+                    }))
+                );*/
 
                 return this.resolveDeltaObjects(deltas, objUNPacked);
             })
