@@ -294,7 +294,7 @@ class Clone extends Common {
                 type: baseObj.type
             });
         }
-        return result;
+        return [...unpckedObjects, ...result];
     }
 
     decodeDeltaHeader(instractions: Buffer) {
@@ -422,17 +422,12 @@ class Clone extends Common {
         return { parsedBytes, offset: offset + parsedBytes, size };
     }
 
-    async fetchPack() {
-        return await readFile(path.join("test/", "pack.file"));
-        //return await readFile(path.join(__dirname, "AngularBlogApp.pack"))
-    }
     cloneRepo() {
-        /*this.getAvalableRefFromServer()
+        this.getAvalableRefFromServer()
             .then(ref => this.extractRefHash(ref))
             .then(({ ref, hash }: { ref: string; hash: string }) =>
                 this.getPackFile(hash)
-            )*/
-        this.fetchPack()
+            )
             .then(res => this.parsePackFile(Buffer.from(res)))
             .then(unpacked => {
                 const deltas = unpacked.filter(v => v?.type == "OBJ_REF_DELTA");
