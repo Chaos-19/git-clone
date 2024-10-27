@@ -9,6 +9,7 @@
     "dev": "ts-node src/index.ts",
     "dev-t": "ts-node src/models/test.ts",
     "dev-c": "ts-node src/models/Clone.ts",
+    "dev-ct": "ts-node src/models/Clones.ts",
     "lint": "eslint . --ext .ts"
   },
   "keywords": [],

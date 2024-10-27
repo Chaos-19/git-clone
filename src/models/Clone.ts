@@ -14,7 +14,7 @@ const OBJTYPE = {
     7: "OBJ_REF_DELTA"
 };
 
-const GITOBJS = ["commit", "tree", "blob"];
+const GITOBJS = ["commit", "tree", "blob", "tag"];
 
 type UNPACKEDOBJTYPE = {
     sha1?: string;
@@ -92,8 +92,8 @@ class Clone extends Common {
     async parsePackFile(packeFile: Buffer) {
         const magicHeader = packeFile.slice(0, 16);
 
-        const objectLength = packeFile.readUInt32BE(16);
-
+        const objectLength = packeFile.readUInt32BE(16); //packeFile.readUInt32BE(8);
+        console.log(objectLength);
         const packedObject = packeFile.slice(20);
 
         const unpackedObject = [];
@@ -101,7 +101,7 @@ class Clone extends Common {
         let readOffset = 0;
 
         for (let index = 0; index < objectLength; index++) {
-            const { parsedBytes, type, size } = this.parsePackObjectHeader(
+            let { parsedBytes, type, size } = this.parsePackObjectHeader(
                 packedObject,
                 readOffset
             );
@@ -109,7 +109,9 @@ class Clone extends Common {
             readOffset += parsedBytes;
 
             if (
-                ["OBJ_COMMIT", "OBJ_TREE", "OBJ_BLOB"].includes(OBJTYPE[type])
+                ["OBJ_COMMIT", "OBJ_TREE", "OBJ_BLOB", "OBJ_TAG"].includes(
+                    OBJTYPE[type]
+                )
             ) {
                 const { decompressedData, parsedBytes: actualSize } =
                     await this.inflateWithLengthLimit(
@@ -127,17 +129,18 @@ class Clone extends Common {
                         <OBJTYPE>GITOBJS[type - 1],
                         false
                     ),
-                    type: OBJTYPE[type],
+                    type: <OBJTYPE>GITOBJS[type - 1],
                     content: decompressedData
                 });
 
-                console.log(<OBJTYPE>GITOBJS[type - 1]);
-                console.log({ type });
+                /*console.log(<OBJTYPE>GITOBJS[type - 1]);*/
+                /*console.log({ type });*/
             } else if (type == 7) {
                 const baseRef = packedObject
                     .slice(readOffset, readOffset + 20)
                     .toString("hex");
-                console.log(baseRef);
+                //console.log(baseRef);
+
                 readOffset += 20;
 
                 const { decompressedData, parsedBytes: actualSize } =
@@ -170,12 +173,12 @@ class Clone extends Common {
         let current = readPosition;
         const type = (packedObj[current] & 112) >> 4;
         let size = packedObj[current] & 15; // 00001111
-        let offset = 4;
+        let left = 4;
 
-        while (packedObj[current] >= 128) {
+        while (packedObj[current] & 0x80) {
             current++;
-            size += (packedObj[current] & 127) << offset;
-            offset += 7;
+            size |= (packedObj[current] & 127) << left;
+            left += 7;
         }
         return {
             parsedBytes: current - readPosition + 1,
@@ -231,69 +234,179 @@ class Clone extends Common {
         );
     }
 
-    async resolveDeltaObjects(
+    /*async resolveDeltaObjects(
         deltaobjects: UNPACKEDOBJTYPE[],
-        unpckedObjects: UNPACKEDOBJTYPE[]
+        unpckedObjects: UNPACKEDOBJTYPE[],
+        result: UNPACKEDOBJTYPE[] = []
+        //pendings: UNPACKEDOBJTYPE[] = []
     ) {
-        let result = [];
+        /*let result = [];
+         *
+        let pendings = [];
+
+        //if (deltaobjects.length > 0) return [...unpckedObjects, ...result];
 
         for (let delta of deltaobjects) {
-            let resolveDelta = Buffer.alloc(0);
-
-            const instructions = delta.content;
-
-            console.log(delta);
-
-            const baseObj = unpckedObjects.find(
-                value => value.sha1 == delta.baseRef
+            const baseExist = [...unpckedObjects, ...result].some(
+                value => value.sha1.trim() == delta.baseRef.trim()
             );
-            console.log(baseObj);
-            let currentPosition = 0;
 
-            const { sourceLength, targetLength, offset } =
-                this.decodeDeltaHeader(instructions);
+            if (!baseExist) {
+                pendings.push(delta);
+            } else {
+                const baseObj = [...unpckedObjects, ...result].find(
+                    value => value.sha1.trim() == delta.baseRef.trim()
+                );
 
-            currentPosition += offset;
+                let resolveDelta = Buffer.alloc(0);
 
-            while (currentPosition < instructions.length) {
-                if (instructions[currentPosition] <= 127) {
-                    const {
-                        parsedBytes,
-                        offset: offseInsert,
-                        size
-                    } = this.parseInsert(instructions, currentPosition);
+                const instructions = delta.content;
+                //console.log(baseObj);
+                let currentPosition = 0;
 
-                    resolveDelta = Buffer.concat([
-                        resolveDelta,
-                        instructions.slice(offseInsert, offseInsert + size)
-                    ]);
+                const { sourceLength, targetLength, offset } =
+                    this.decodeDeltaHeader(instructions);
 
-                    currentPosition += parsedBytes + size;
-                } else if (
-                    instructions[currentPosition] > 127 &&
-                    instructions[currentPosition] < 256
-                ) {
-                    const {
-                        parsedBytes,
-                        offset: offsetCopy,
-                        size
-                    } = this.parseCopy(instructions, currentPosition);
+                currentPosition += offset;
 
-                    resolveDelta = Buffer.concat([
-                        resolveDelta,
-                        baseObj.content.slice(offsetCopy, offsetCopy + size)
-                    ]);
+                while (currentPosition < instructions.length) {
+                    if (instructions[currentPosition] <= 127) {
+                        const {
+                            parsedBytes,
+                            offset: offseInsert,
+                            size
+                        } = this.parseInsert(instructions, currentPosition);
 
-                    currentPosition += parsedBytes;
+                        resolveDelta = Buffer.concat([
+                            resolveDelta,
+                            instructions.slice(offseInsert, offseInsert + size)
+                        ]);
+
+                        currentPosition += parsedBytes + size;
+                    } else if (
+                        instructions[currentPosition] > 127 &&
+                        instructions[currentPosition] < 256
+                    ) {
+                        const {
+                            parsedBytes,
+                            offset: offsetCopy,
+                            size
+                        } = this.parseCopy(instructions, currentPosition);
+
+                        resolveDelta = Buffer.concat([
+                            resolveDelta,
+                            baseObj.content.slice(offsetCopy, offsetCopy + size)
+                        ]);
+
+                        currentPosition += parsedBytes;
+                    }
                 }
-            }
 
-            result.push({
-                sha1: this.hashObjct(resolveDelta, baseObj.type, false),
-                content: resolveDelta,
-                type: baseObj.type
-            });
+                result.push({
+                    sha1: this.hashObjct(resolveDelta, baseObj.type, false),
+                    content: resolveDelta,
+                    type: baseObj.type
+                });
+            }
         }
+
+        if (pendings.length > 0) {
+            console.log(pendings.length, result.length);
+            //const newResult =
+            return await this.resolveDeltaObjects(
+                pendings,
+                unpckedObjects,
+                [...unpckedObjects, ...result]
+            );
+
+            //result = [...result, ...newResult];
+
+
+        }
+         
+        return [...unpckedObjects, ...result];
+    }*/
+    async resolveDeltaObjects(
+        deltaobjects: UNPACKEDOBJTYPE[],
+        unpckedObjects: UNPACKEDOBJTYPE[],
+        result: UNPACKEDOBJTYPE[] = []
+    ) {
+        let pendings = [];
+
+        for (let delta of deltaobjects) {
+            const baseExist = [
+                ...new Set([...unpckedObjects, ...result])
+            ].filter(value => value.sha1 == delta.baseRef);
+
+            if (!baseExist.length) {
+                pendings.push(delta);
+            } else {
+                const baseObj = [
+                    ...new Set([...unpckedObjects, ...result])
+                ].filter(value => value.sha1 == delta.baseRef)[0];
+
+                let resolveDelta = Buffer.alloc(0);
+
+                const instructions = delta.content;
+                let currentPosition = 0;
+
+                const { sourceLength, targetLength, offset } =
+                    this.decodeDeltaHeader(instructions);
+
+                currentPosition += offset;
+
+                while (currentPosition < instructions.length) {
+                    if (instructions[currentPosition] <= 127) {
+                        const {
+                            parsedBytes,
+                            offset: offseInsert,
+                            size
+                        } = this.parseInsert(instructions, currentPosition);
+
+                        resolveDelta = Buffer.concat([
+                            resolveDelta,
+                            instructions.slice(offseInsert, offseInsert + size)
+                        ]);
+
+                        currentPosition += parsedBytes + size;
+                    } else if (
+                        instructions[currentPosition] > 127 &&
+                        instructions[currentPosition] < 256
+                    ) {
+                        const {
+                            parsedBytes,
+                            offset: offsetCopy,
+                            size
+                        } = this.parseCopy(instructions, currentPosition);
+
+                        resolveDelta = Buffer.concat([
+                            resolveDelta,
+                            baseObj.content.slice(offsetCopy, offsetCopy + size)
+                        ]);
+
+                        currentPosition += parsedBytes;
+                    }
+                }
+
+                result.push({
+                    sha1: this.hashObjct(resolveDelta, baseObj.type, false),
+                    content: resolveDelta,
+                    type: baseObj.type
+                });
+            }
+        }
+
+        if (pendings.length > 0) {
+            console.log(pendings.length, result.length);
+
+            const newResult = await this.resolveDeltaObjects(
+                pendings,
+                unpckedObjects,
+                [...new Set([...unpckedObjects, ...result])]
+            );
+            result = [...result, ...newResult];
+        }
+
         return [...unpckedObjects, ...result];
     }
 
@@ -421,41 +534,53 @@ class Clone extends Common {
         const parsedBytes = 1;
         return { parsedBytes, offset: offset + parsedBytes, size };
     }
+    
+    
+    async fetchPack() {
+        return await readFile(path.join("test", "json.pack"));
+        //return await readFile(path.join(__dirname, "AngularBlogApp.pack"))
+    }
 
     cloneRepo() {
-        this.getAvalableRefFromServer()
+        /*this.getAvalableRefFromServer()
             .then(ref => this.extractRefHash(ref))
             .then(({ ref, hash }: { ref: string; hash: string }) =>
                 this.getPackFile(hash)
-            )
+            )*/
+        this.fetchPack()
             .then(res => this.parsePackFile(Buffer.from(res)))
             .then(unpacked => {
                 const deltas = unpacked.filter(v => v?.type == "OBJ_REF_DELTA");
                 const objUNPacked = unpacked.filter(
                     v => v?.type !== "OBJ_REF_DELTA"
                 );
-
-                /*console.log(
-                    unpacked.map(value => ({
-                        ...value,
-                        contentS: value.content.toString()
-                    }))
-                );*/
-
                 return this.resolveDeltaObjects(deltas, objUNPacked);
             })
-            .then(resolv =>
+            .then(resolv => {
+                this.fs.writeFileSync(
+                    "result.test.json",
+                    JSON.stringify(
+                        resolv.map(value => ({
+                            ...value,
+                            content: value.content.toString()
+                        }))
+                    )
+                );
+
                 console.log(
                     resolv.map(value => ({
                         ...value,
-                        contentS: value.content.toString()
-                    }))
-                )
-            )
+                        content: ""
+                    })).length
+                );
+            })
             .catch(error => console.log(error));
     }
-}
+    
+    
 
-const cloneFun = new Clone("https://github.com/Chaos-19/termux-scripts.git");
+    
+
+const cloneFun = new Clone("https://github.com/Chaos-19/json-graph-acode.git");
 
 cloneFun.cloneRepo();

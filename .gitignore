@@ -2,5 +2,7 @@ node_modules/
 test/
 note.txt
 *.review.md
-
+*.test.json
+*.test.*
 removed_fun.js
+src/models/Clones.ts
