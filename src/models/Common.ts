@@ -8,13 +8,15 @@ export type OBJTYPE = "commit" | "blob" | "tree" | "tag";
 
 export class Common {
     fs: FileAdapter; // = FsFileAdapter.getInstace();
+    ROOT_DIR:string
 
-    constructor() {
+    constructor(ROOT_DIR:string="") {
         this.fs = FsFileAdapter.getInstace();
+        this.ROOT_DIR = Boolean(ROOT_DIR)?`./${ROOT_DIR}/`:``
     }
 
     //return the hash SHA1
-    hashObjct(data: Buffer, type: OBJTYPE, write: boolean = true): string {
+    hashObject(data: Buffer, type: OBJTYPE, write: boolean = true): string {
         const size = Buffer.byteLength(data);
         const header = Buffer.from(`${type} ${size}\0`, "utf8");
 
@@ -23,8 +25,9 @@ export class Common {
         const SHA1 = crypto.createHash("sha1").update(objContent).digest("hex");
 
         if (write) {
-            const dirPath = `.git/objects/${SHA1.slice(0, 2)}`;
-            const path = `.git/objects/${SHA1.slice(0, 2)}/${SHA1.slice(2)}`;
+            const dirPath = `${this.ROOT_DIR}.git/objects/${SHA1.slice(0, 2)}`;
+            
+            const path = `${this.ROOT_DIR}.git/objects/${SHA1.slice(0, 2)}/${SHA1.slice(2)}`;
             if (!this.fs.existsSync(dirPath))
                 this.fs.mkdirSync(dirPath, {
                     recursive: true

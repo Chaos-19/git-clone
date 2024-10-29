@@ -16,6 +16,11 @@ const OBJTYPE = {
 
 const GITOBJS = ["commit", "tree", "blob", "tag"];
 
+type RefType = {
+    ref: string;
+    hash: string;
+};
+
 type UNPACKEDOBJTYPE = {
     sha1?: string;
     content: Buffer;
@@ -28,8 +33,8 @@ class Clone extends Common {
     pattern: RegExp = /^(https:\/\/github\.com\/)([\w\-.]+)\/([\w\-.]+)\.git$/;
     refList: string[] = [];
 
-    constructor(url: string) {
-        super();
+    constructor(url: string, ROOT_DIR: string = "") {
+        super(ROOT_DIR);
         if (!this.pattern.test(url))
             throw new Error("The URL is not a valid GitHub repository");
 
@@ -69,24 +74,86 @@ class Clone extends Common {
         return result;
     }
 
-    async extractRefHash(input: string): Promise<{
-        ref: string;
-        hash: string;
-    }> {
+    async extractRefHash(
+        input: string,
+        head = true
+    ): Promise<RefType | RefType[]> {
         const regex =
             /(\s?[0-9a-fA-F]{4})([0-9a-fA-F]{40})(\srefs[/\w+-/\w+/]+|\sHEAD)/gm;
 
-        return [...input.matchAll(regex)]
-            .map(([, , ...res]) => ({
-                ref: res.pop(),
-                hash: res.pop()
-            }))
-            .find(
-                refInfo =>
-                    refInfo.ref.trim() === "refs/heads/main" ||
-                    refInfo.ref.trim() === "refs/heads/master"
-                //|| refInfo.ref.trim() === "HEAD"
+        const refs = [...input.matchAll(regex)].map(([, , ...res]) => ({
+            ref: res.pop(),
+            hash: res.pop()
+        }));
+       
+
+        return head
+            ? refs.find(
+                  refInfo =>
+                      refInfo.ref.trim() === "refs/heads/main" ||
+                      refInfo.ref.trim() === "refs/heads/master"
+                  //|| refInfo.ref.trim() === "HEAD"
+              )
+            : refs;
+    }
+
+    createRefs(refs: RefType[]): void {
+        const currentBranch = refs.find(
+            refInfo =>
+                refInfo.ref.trim() == "HEAD" ||
+                refInfo.ref.trim() === "refs/heads/main" ||
+                refInfo.ref.trim() === "refs/heads/master"
+        );
+        
+        const HEAD = {...currentBranch,}
+
+        if (!this.fs.existsSync(`${this.ROOT_DIR}/.git/refs/heads`))
+            this.fs.mkdirSync(`${this.ROOT_DIR}/.git/refs/heads`, {
+                recursive: true
+            });
+        this.fs.writeFileSync(
+           `${this.ROOT_DIR}/.git/refs/heads/${currentBranch.ref.split("/").pop()}`,
+            currentBranch.hash
+        );
+
+        const pull = refs
+            .filter(ref => ref.ref.split("/").includes("pull"))
+            .map(ref => ({
+                ...ref,
+                filePath: ref.ref.trim(),
+                dirPath: ref.ref
+                    .trim()
+                    .replace(`/${ref.ref.split("/").pop()}`, "")
+            }));
+
+        const tags = refs
+            .filter(ref => ref.ref.split("/").includes("tags"))
+            .map(ref => ({
+                ...ref,
+                filePath: ref.ref.trim(),
+                dirPath: ref.ref
+                    .trim()
+                    .replace(`/${ref.ref.split("/").pop()}`, "")
+            }));
+
+        const remotes = refs
+            .filter(ref => ref.ref.split("/").includes("heads"))
+            .map(ref => ({
+                ...ref,
+                filePath: `refs/remotes/origin/${ref.ref.split("/").pop()}`,
+                dirPath: `refs/remotes/origin`
+            }));
+
+        [...pull, ...remotes, ...tags,...HEAD].forEach(ref => {
+            if (!this.fs.existsSync(this.ROOT_DIR + `/.git/${ref.dirPath}`))
+                this.fs.mkdirSync(this.ROOT_DIR + `/.git/${ref.dirPath}`, {
+                    recursive: true
+                });
+            this.fs.writeFileSync(
+                this.ROOT_DIR + `/.git/${ref.filePath}`,
+                ref.hash
             );
+        });
     }
 
     async parsePackFile(packeFile: Buffer) {
@@ -124,10 +191,10 @@ class Clone extends Common {
                 readOffset += actualSize;
 
                 unpackedObject.push({
-                    sha1: this.hashObjct(
+                    sha1: this.hashObject(
                         decompressedData,
                         <OBJTYPE>GITOBJS[type - 1],
-                        false
+                        //false
                     ),
                     type: <OBJTYPE>GITOBJS[type - 1],
                     content: decompressedData
@@ -234,98 +301,6 @@ class Clone extends Common {
         );
     }
 
-    /*async resolveDeltaObjects(
-        deltaobjects: UNPACKEDOBJTYPE[],
-        unpckedObjects: UNPACKEDOBJTYPE[],
-        result: UNPACKEDOBJTYPE[] = []
-        //pendings: UNPACKEDOBJTYPE[] = []
-    ) {
-        /*let result = [];
-         *
-        let pendings = [];
-
-        //if (deltaobjects.length > 0) return [...unpckedObjects, ...result];
-
-        for (let delta of deltaobjects) {
-            const baseExist = [...unpckedObjects, ...result].some(
-                value => value.sha1.trim() == delta.baseRef.trim()
-            );
-
-            if (!baseExist) {
-                pendings.push(delta);
-            } else {
-                const baseObj = [...unpckedObjects, ...result].find(
-                    value => value.sha1.trim() == delta.baseRef.trim()
-                );
-
-                let resolveDelta = Buffer.alloc(0);
-
-                const instructions = delta.content;
-                //console.log(baseObj);
-                let currentPosition = 0;
-
-                const { sourceLength, targetLength, offset } =
-                    this.decodeDeltaHeader(instructions);
-
-                currentPosition += offset;
-
-                while (currentPosition < instructions.length) {
-                    if (instructions[currentPosition] <= 127) {
-                        const {
-                            parsedBytes,
-                            offset: offseInsert,
-                            size
-                        } = this.parseInsert(instructions, currentPosition);
-
-                        resolveDelta = Buffer.concat([
-                            resolveDelta,
-                            instructions.slice(offseInsert, offseInsert + size)
-                        ]);
-
-                        currentPosition += parsedBytes + size;
-                    } else if (
-                        instructions[currentPosition] > 127 &&
-                        instructions[currentPosition] < 256
-                    ) {
-                        const {
-                            parsedBytes,
-                            offset: offsetCopy,
-                            size
-                        } = this.parseCopy(instructions, currentPosition);
-
-                        resolveDelta = Buffer.concat([
-                            resolveDelta,
-                            baseObj.content.slice(offsetCopy, offsetCopy + size)
-                        ]);
-
-                        currentPosition += parsedBytes;
-                    }
-                }
-
-                result.push({
-                    sha1: this.hashObjct(resolveDelta, baseObj.type, false),
-                    content: resolveDelta,
-                    type: baseObj.type
-                });
-            }
-        }
-
-        if (pendings.length > 0) {
-            console.log(pendings.length, result.length);
-            //const newResult =
-            return await this.resolveDeltaObjects(
-                pendings,
-                unpckedObjects,
-                [...unpckedObjects, ...result]
-            );
-
-            //result = [...result, ...newResult];
-
-
-        }
-         
-        return [...unpckedObjects, ...result];
-    }*/
     async resolveDeltaObjects(
         deltaobjects: UNPACKEDOBJTYPE[],
         unpckedObjects: UNPACKEDOBJTYPE[],
@@ -389,7 +364,9 @@ class Clone extends Common {
                 }
 
                 result.push({
-                    sha1: this.hashObjct(resolveDelta, baseObj.type, false),
+                    sha1: this.hashObject(resolveDelta, baseObj.type
+                    //false
+                    ),
                     content: resolveDelta,
                     type: baseObj.type
                 });
@@ -534,8 +511,7 @@ class Clone extends Common {
         const parsedBytes = 1;
         return { parsedBytes, offset: offset + parsedBytes, size };
     }
-    
-    
+
     async fetchPack() {
         return await readFile(path.join("test", "json.pack"));
         //return await readFile(path.join(__dirname, "AngularBlogApp.pack"))
@@ -557,7 +533,7 @@ class Clone extends Common {
                 return this.resolveDeltaObjects(deltas, objUNPacked);
             })
             .then(resolv => {
-                this.fs.writeFileSync(
+                /*this.fs.writeFileSync(
                     "result.test.json",
                     JSON.stringify(
                         resolv.map(value => ({
@@ -566,7 +542,7 @@ class Clone extends Common {
                         }))
                     )
                 );
-
+*/
                 console.log(
                     resolv.map(value => ({
                         ...value,
@@ -576,11 +552,22 @@ class Clone extends Common {
             })
             .catch(error => console.log(error));
     }
-    
-    
+}
 
-    
-
-const cloneFun = new Clone("https://github.com/Chaos-19/json-graph-acode.git");
+const cloneFun = new Clone(
+    "https://github.com/Chaos-19/json-graph-acode.git",
+    "GIT_DIR"
+);
 
 cloneFun.cloneRepo();
+/*cloneFun
+    .extractRefHash(
+        `001e# service=git-upload-pack
+00000153450b77b247af4f0780772ba416e08a9d74173100 HEAD multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed allow-tip-sha1-in-want allow-reachable-sha1-in-want no-done symref=HEAD:refs/heads/main filter object-format=sha1 agent=git/github-dd2ba9052dea
+003d450b77b247af4f0780772ba416e08a9d74173100 refs/heads/main
+003e450b77b247af4f0780772ba416e08a9d74173100 refs/tags/v1.0.1
+0000`,
+        false
+    )
+    .then(res => cloneFun.createRefs(res as RefType[]));
+*/
