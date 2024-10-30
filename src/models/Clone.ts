@@ -1,9 +1,11 @@
 import { Common, OBJTYPE } from "./Common";
-import { createInflate } from "zlib";
+import zlib, { createInflate } from "zlib";
 import { PassThrough, pipeline } from "stream";
 
 import path from "path";
 import { readFile } from "fs/promises";
+
+import { Tree } from "./Tree";
 
 const OBJTYPE = {
     1: "OBJ_COMMIT",
@@ -77,7 +79,7 @@ class Clone extends Common {
     async extractRefHash(
         input: string,
         head = true
-    ): Promise<RefType | RefType[]> {
+    ): Promise<RefType | { refs: RefType[]; head: string }> {
         const regex =
             /(\s?[0-9a-fA-F]{4})([0-9a-fA-F]{40})(\srefs[/\w+-/\w+/]+|\sHEAD)/gm;
 
@@ -85,7 +87,6 @@ class Clone extends Common {
             ref: res.pop(),
             hash: res.pop()
         }));
-       
 
         return head
             ? refs.find(
@@ -94,27 +95,40 @@ class Clone extends Common {
                       refInfo.ref.trim() === "refs/heads/master"
                   //|| refInfo.ref.trim() === "HEAD"
               )
-            : refs;
+            : {
+                  refs,
+                  head: input
+                      .match(/\b(symref=HEAD:refs\/heads\/\w+)\b/g)
+                      .join()
+              };
     }
 
-    createRefs(refs: RefType[]): void {
+    createRefs({ refs, head }: { refs: RefType[]; head: string }): void {
         const currentBranch = refs.find(
             refInfo =>
                 refInfo.ref.trim() == "HEAD" ||
                 refInfo.ref.trim() === "refs/heads/main" ||
                 refInfo.ref.trim() === "refs/heads/master"
         );
-        
-        const HEAD = {...currentBranch,}
+
+        const HEAD = {
+            ...currentBranch,
+            hash: `ref: ${head.split(":").pop().trim()}`,
+            filePath: `refs/remotes/origin/HEAD`,
+            dirPath: `refs/remotes/origin`
+        };
 
         if (!this.fs.existsSync(`${this.ROOT_DIR}/.git/refs/heads`))
             this.fs.mkdirSync(`${this.ROOT_DIR}/.git/refs/heads`, {
                 recursive: true
             });
+
         this.fs.writeFileSync(
-           `${this.ROOT_DIR}/.git/refs/heads/${currentBranch.ref.split("/").pop()}`,
+            `${this.ROOT_DIR}/.git/refs/heads/${head.split("/").pop()}`,
             currentBranch.hash
         );
+
+        this.fs.writeFileSync(`${this.ROOT_DIR}/.git/HEAD`, HEAD.hash);
 
         const pull = refs
             .filter(ref => ref.ref.split("/").includes("pull"))
@@ -144,7 +158,7 @@ class Clone extends Common {
                 dirPath: `refs/remotes/origin`
             }));
 
-        [...pull, ...remotes, ...tags,...HEAD].forEach(ref => {
+        [...pull, ...remotes, ...tags, HEAD].forEach(ref => {
             if (!this.fs.existsSync(this.ROOT_DIR + `/.git/${ref.dirPath}`))
                 this.fs.mkdirSync(this.ROOT_DIR + `/.git/${ref.dirPath}`, {
                     recursive: true
@@ -193,20 +207,16 @@ class Clone extends Common {
                 unpackedObject.push({
                     sha1: this.hashObject(
                         decompressedData,
-                        <OBJTYPE>GITOBJS[type - 1],
+                        <OBJTYPE>GITOBJS[type - 1]
                         //false
                     ),
                     type: <OBJTYPE>GITOBJS[type - 1],
                     content: decompressedData
                 });
-
-                /*console.log(<OBJTYPE>GITOBJS[type - 1]);*/
-                /*console.log({ type });*/
             } else if (type == 7) {
                 const baseRef = packedObject
                     .slice(readOffset, readOffset + 20)
                     .toString("hex");
-                //console.log(baseRef);
 
                 readOffset += 20;
 
@@ -364,8 +374,10 @@ class Clone extends Common {
                 }
 
                 result.push({
-                    sha1: this.hashObject(resolveDelta, baseObj.type
-                    //false
+                    sha1: this.hashObject(
+                        resolveDelta,
+                        baseObj.type
+                        //false
                     ),
                     content: resolveDelta,
                     type: baseObj.type
@@ -512,14 +524,128 @@ class Clone extends Common {
         return { parsedBytes, offset: offset + parsedBytes, size };
     }
 
+    checkOut(unpackedObject: UNPACKEDOBJTYPE[]) {
+        let headCommitSHA1 = "";
+        let headCommitTreeSHA1 = "";
+        if (this.fs.existsSync(`${this.ROOT_DIR}/.git/HEAD`)) {
+            const currentHead = this.fs
+                .readFileSync(this.ROOT_DIR + `/.git/HEAD`)
+                .toString()
+                .split("/")
+                .pop();
+
+            headCommitSHA1 = this.fs
+                .readFileSync(this.ROOT_DIR + `/.git/refs/heads/${currentHead}`)
+                .toString();
+        }
+        console.log(headCommitSHA1);
+        if (headCommitSHA1) {
+            headCommitTreeSHA1 = unpackedObject
+                .find(obj => obj.sha1 == headCommitSHA1)
+                ?.content.toString()
+                .match(/tree\s[0-9a-fA-F]{40}/g)
+                .join("")
+                .split(" ")
+                .pop();
+            const parsedTree = this.parseTree(headCommitTreeSHA1);
+
+            parsedTree.forEach(entry => {
+                const path = entry.path.split("/");
+                const fileName = path.pop();
+                const dir = path;
+
+                if (!dir.length) {
+                    this.fs.writeFileSync(
+                        `${this.ROOT_DIR}/${fileName}`,
+                        unpackedObject
+                            .find(obj => obj.sha1 == entry.sha1)
+                            .content.toString()
+                    );
+                } else {
+                    if (
+                        !this.fs.existsSync(`${this.ROOT_DIR}/${dir.join("/")}`)
+                    )
+                        this.fs.mkdirSync(`${this.ROOT_DIR}/${dir.join("/")}`, {
+                            recursive: true
+                        });
+                    this.fs.writeFileSync(
+                        `${this.ROOT_DIR}/${entry.path}`,
+                        unpackedObject
+                            .find(obj => obj.sha1 == entry.sha1)
+                            .content.toString()
+                    );
+                }
+            });
+        }
+    }
+
+    parseTree(
+        treeSh1: string,
+        entryList: {
+            mode: number;
+            path: string;
+            sha1: string;
+        }[] = [],
+        nesteDir: string[] = []
+    ) {
+        const treeDir = treeSh1.slice(0, 2);
+        const treeFile = treeSh1.slice(2);
+
+        const treePath = `${this.ROOT_DIR}/.git/objects/${treeDir}/${treeFile}`;
+        const treeContent = this.fs.readFileSync(treePath);
+
+        const unCompressTree = zlib.unzipSync(treeContent);
+
+        const nullByte = unCompressTree.indexOf("\0");
+
+        let entries = unCompressTree.slice(nullByte + 1);
+
+        while (entries.length) {
+            const [mode, fileName] = entries
+                .slice(0, entries.indexOf("\x00"))
+                .toString()
+                .split(" ");
+            entries = entries.slice(entries.indexOf("\x00") + 1);
+            const sha1 = entries.slice(0, 20);
+
+            if (mode == "40000")
+                entryList = [
+                    ...entryList,
+                    ...this.parseTree(
+                        sha1.toString("hex"),
+                        [],
+                        [...nesteDir, fileName]
+                    )
+                ];
+            else
+                entryList.push({
+                    mode: parseInt(mode),
+                    path:
+                        (!nesteDir.length ? "" : `${nesteDir.join("/")}/`) +
+                        fileName,
+                    sha1: sha1.toString("hex")
+                });
+
+            entries = entries.slice(20);
+        }
+
+        return entryList;
+    }
+
     async fetchPack() {
-        return await readFile(path.join("test", "json.pack"));
+        return await readFile(path.join("test", "AngularBlogApp.pack"));
         //return await readFile(path.join(__dirname, "AngularBlogApp.pack"))
     }
 
     cloneRepo() {
         /*this.getAvalableRefFromServer()
-            .then(ref => this.extractRefHash(ref))
+            .then(ref => {
+            this.createRefs(ref as {
+            refs: RefType[]; head: string 
+              
+            })
+            return this.extractRefHash(ref)
+            })
             .then(({ ref, hash }: { ref: string; hash: string }) =>
                 this.getPackFile(hash)
             )*/
@@ -533,22 +659,14 @@ class Clone extends Common {
                 return this.resolveDeltaObjects(deltas, objUNPacked);
             })
             .then(resolv => {
-                /*this.fs.writeFileSync(
-                    "result.test.json",
-                    JSON.stringify(
-                        resolv.map(value => ({
-                            ...value,
-                            content: value.content.toString()
-                        }))
-                    )
-                );
-*/
                 console.log(
                     resolv.map(value => ({
                         ...value,
                         content: ""
                     })).length
                 );
+
+                return this.checkOut(resolv);
             })
             .catch(error => console.log(error));
     }
@@ -558,16 +676,16 @@ const cloneFun = new Clone(
     "https://github.com/Chaos-19/json-graph-acode.git",
     "GIT_DIR"
 );
-
 cloneFun.cloneRepo();
-/*cloneFun
+
+cloneFun
     .extractRefHash(
         `001e# service=git-upload-pack
-00000153450b77b247af4f0780772ba416e08a9d74173100 HEAD multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed allow-tip-sha1-in-want allow-reachable-sha1-in-want no-done symref=HEAD:refs/heads/main filter object-format=sha1 agent=git/github-dd2ba9052dea
-003d450b77b247af4f0780772ba416e08a9d74173100 refs/heads/main
-003e450b77b247af4f0780772ba416e08a9d74173100 refs/tags/v1.0.1
+000001532c221913c1ae3954021962833974ff58a9a8d623 HEAD multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed allow-tip-sha1-in-want allow-reachable-sha1-in-want no-done symref=HEAD:refs/heads/main filter object-format=sha1 agent=git/github-dd2ba9052dea
+004183c16c998652f770d6c4ea38ec8bfcd02c5cb716 refs/heads/gh-pages
+003d2c221913c1ae3954021962833974ff58a9a8d623 refs/heads/main
 0000`,
         false
     )
-    .then(res => cloneFun.createRefs(res as RefType[]));
-*/
+    .then(res => cloneFun.createRefs(res as { refs: RefType[]; head: string }));
+cloneFun.checkOut([]);
