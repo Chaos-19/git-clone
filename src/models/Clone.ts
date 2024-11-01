@@ -1,11 +1,16 @@
 import { Common, OBJTYPE } from "./Common";
 import zlib, { createInflate } from "zlib";
+import crypto from "crypto";
 import { PassThrough, pipeline } from "stream";
 
 import path from "path";
 import { readFile } from "fs/promises";
 
 import { Tree } from "./Tree";
+import { Index } from "./Index";
+import { Entry } from "./Entry";
+import { EntryType } from "../types";
+import { convertTimeToGit, getFileMode, convertTo12Bit } from "../utils/utils";
 
 const OBJTYPE = {
     1: "OBJ_COMMIT",
@@ -164,7 +169,7 @@ class Clone extends Common {
                     recursive: true
                 });
             this.fs.writeFileSync(
-                this.ROOT_DIR + `/.git/${ref.filePath}`,
+                this.ROOT_DIR + `.git/${ref.filePath}`,
                 ref.hash
             );
         });
@@ -527,18 +532,18 @@ class Clone extends Common {
     checkOut(unpackedObject: UNPACKEDOBJTYPE[]) {
         let headCommitSHA1 = "";
         let headCommitTreeSHA1 = "";
-        if (this.fs.existsSync(`${this.ROOT_DIR}/.git/HEAD`)) {
+        if (this.fs.existsSync(`${this.ROOT_DIR}.git/HEAD`)) {
             const currentHead = this.fs
-                .readFileSync(this.ROOT_DIR + `/.git/HEAD`)
+                .readFileSync(this.ROOT_DIR + `.git/HEAD`)
                 .toString()
                 .split("/")
                 .pop();
 
             headCommitSHA1 = this.fs
-                .readFileSync(this.ROOT_DIR + `/.git/refs/heads/${currentHead}`)
+                .readFileSync(this.ROOT_DIR + `.git/refs/heads/${currentHead}`)
                 .toString();
         }
-        console.log(headCommitSHA1);
+
         if (headCommitSHA1) {
             headCommitTreeSHA1 = unpackedObject
                 .find(obj => obj.sha1 == headCommitSHA1)
@@ -556,27 +561,133 @@ class Clone extends Common {
 
                 if (!dir.length) {
                     this.fs.writeFileSync(
-                        `${this.ROOT_DIR}/${fileName}`,
+                        `${this.ROOT_DIR}${fileName}`,
                         unpackedObject
                             .find(obj => obj.sha1 == entry.sha1)
                             .content.toString()
                     );
                 } else {
-                    if (
-                        !this.fs.existsSync(`${this.ROOT_DIR}/${dir.join("/")}`)
-                    )
-                        this.fs.mkdirSync(`${this.ROOT_DIR}/${dir.join("/")}`, {
+                    if (!this.fs.existsSync(`${this.ROOT_DIR}${dir.join("/")}`))
+                        this.fs.mkdirSync(`${this.ROOT_DIR}${dir.join("/")}`, {
                             recursive: true
                         });
                     this.fs.writeFileSync(
-                        `${this.ROOT_DIR}/${entry.path}`,
+                        `${this.ROOT_DIR}${entry.path}`,
                         unpackedObject
                             .find(obj => obj.sha1 == entry.sha1)
                             .content.toString()
                     );
                 }
             });
+
+            const entryListForIndex = parsedTree
+                .sort((a, b) => a.path.localeCompare(b.path))
+                .map(entry => {
+                    const currentEntry = unpackedObject.find(
+                        obj => obj.sha1 == entry.sha1
+                    );
+                    console.log(parsedTree);
+                    if (!currentEntry) throw new Error("Entry Not Found!!");
+
+                    const state = this.fs.statSync(
+                        `${this.ROOT_DIR}${entry.path}`
+                    );
+
+                    const {
+                        dev, // Device ID
+                        ino, // Inode number
+                        mode, // File mode/permissions
+                        uid, // User ID of the file owner
+                        gid, // Group ID of the file owner
+                        size, // Size of the file in bytes
+                        ctimeMs, // Creation/change time in milliseconds
+                        mtimeMs // Modification time in milliseconds
+                    } = state;
+
+                    const { ctime_s, ctime_n, mtime_s, mtime_n } =
+                        convertTimeToGit({
+                            ctimeMs,
+                            mtimeMs
+                        });
+
+                    const newEntry = new Entry(
+                        ctime_s,
+                        ctime_n,
+                        mtime_s,
+                        mtime_n,
+                        dev,
+                        ino,
+                        mode,
+                        uid,
+                        gid,
+                        size,
+                        convertTo12Bit(entry.path.length),
+                        entry.sha1,
+                        entry.path
+                    );
+
+                    return newEntry.getWritebleEntry();
+                });
+
+            this.writeToIndexFile(entryListForIndex);
         }
+    }
+    getIndexHeader(entriesCount: number) {
+        const signature = Buffer.from("DIRC", "utf-8");
+        const version = Buffer.alloc(4);
+        version.writeUInt32BE(2, 0);
+        const numEntries = Buffer.alloc(4);
+        numEntries.writeUInt32BE(entriesCount, 0);
+
+        return Buffer.concat([signature, version, numEntries]);
+    }
+    writeToIndexFile(entries: EntryType<Buffer, Buffer>[]) {
+        let indexContent = this.getIndexHeader(entries.length);
+
+        entries.forEach(entry => {
+            console.log(entry.flags);
+            const fields = Buffer.concat([
+                entry.ctime_s,
+                entry.ctime_n,
+                entry.mtime_s,
+                entry.mtime_n,
+                entry.dev,
+                entry.ino,
+                entry.mode,
+                entry.uid,
+                entry.gid,
+                entry.size,
+                entry.sha1,
+                entry.flags
+            ]);
+
+            const padding = Math.trunc(
+                (8 - ((entry.path.length + 62) % 8)) % 8
+            );
+
+            // Create padding buffer
+            const paddingBuffer = Buffer.alloc(padding, 0);
+
+            const entryBuffer = Buffer.concat([
+                fields,
+                entry.path,
+                paddingBuffer
+            ]);
+
+            indexContent = Buffer.concat([indexContent, entryBuffer]);
+            //return entryBuffer;
+        });
+
+        //indexContent = Buffer.concat([indexContent, allEntry]);
+
+        const indexSHA = crypto
+            .createHash("sha1")
+            .update(indexContent)
+            .digest();
+
+        const finalIndexContent = Buffer.concat([indexContent, indexSHA]);
+
+        this.fs.writeFileSync(`${this.ROOT_DIR}.git/index`, finalIndexContent);
     }
 
     parseTree(
@@ -591,7 +702,7 @@ class Clone extends Common {
         const treeDir = treeSh1.slice(0, 2);
         const treeFile = treeSh1.slice(2);
 
-        const treePath = `${this.ROOT_DIR}/.git/objects/${treeDir}/${treeFile}`;
+        const treePath = `${this.ROOT_DIR}.git/objects/${treeDir}/${treeFile}`;
         const treeContent = this.fs.readFileSync(treePath);
 
         const unCompressTree = zlib.unzipSync(treeContent);
@@ -676,16 +787,34 @@ const cloneFun = new Clone(
     "https://github.com/Chaos-19/json-graph-acode.git",
     "GIT_DIR"
 );
+/*
 cloneFun.cloneRepo();
-
-cloneFun
-    .extractRefHash(
-        `001e# service=git-upload-pack
+cloneFun.extractRefHash(
+    `001e# service=git-upload-pack
 000001532c221913c1ae3954021962833974ff58a9a8d623 HEAD multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed allow-tip-sha1-in-want allow-reachable-sha1-in-want no-done symref=HEAD:refs/heads/main filter object-format=sha1 agent=git/github-dd2ba9052dea
 004183c16c998652f770d6c4ea38ec8bfcd02c5cb716 refs/heads/gh-pages
 003d2c221913c1ae3954021962833974ff58a9a8d623 refs/heads/main
 0000`,
-        false
-    )
+    false
+);
     .then(res => cloneFun.createRefs(res as { refs: RefType[]; head: string }));
-cloneFun.checkOut([]);
+*/
+const { FsFileAdapter } = require("../adapters/FsFileAdapter");
+const fileAdapter: typeof FsFileAdapter = FsFileAdapter.getInstace();
+const index = new Index();
+console.log();
+fileAdapter.writeFileSync(
+    "str.test.json",
+    JSON.stringify(
+        index.readIndex().map(val => ({
+            path: val.path.toString(),
+            sha1: val.sha1,
+            exist: fileAdapter.existsSync(
+                `./GIT_DIR/.git/objects/${val.sha1.slice(
+                    0,
+                    2
+                )}/${val.sha1.slice(2)}`
+            )
+        }))
+    )
+);

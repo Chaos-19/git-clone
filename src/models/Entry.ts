@@ -72,7 +72,7 @@ export class Entry {
 
         flag.writeUInt16BE(convertTo12Bit(this.path.length), 0);
 
-        console.log(this.getEntrySize());
+        //console.log(this.getEntrySize());
 
         return {
             ctime_s: ctime_s_buf,
@@ -89,7 +89,7 @@ export class Entry {
             flags: Buffer.concat([flag]),
             path: Buffer.concat([
                 Buffer.from(this.path, "utf-8"),
-                Buffer.from("\x00", "utf-8")
+                Buffer.from("\x00")
             ])
             //padding: Buffer.alloc(this.getEntrySize().padding, 0)
         };
@@ -98,7 +98,7 @@ export class Entry {
     getEntrySize() {
         const pathLength = Buffer.concat([
             Buffer.from(this.path, "utf-8"),
-            Buffer.from("\x00", "utf-8")
+            Buffer.from("\x00")
         ]).length;
         const entrySize = 62 + pathLength;
 

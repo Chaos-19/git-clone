@@ -6,3 +6,4 @@ note.txt
 *.test.*
 removed_fun.js
 src/models/Clones.ts
+GIT_DIR/

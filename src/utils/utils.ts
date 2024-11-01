@@ -34,7 +34,7 @@ export function convertTimeToGit({
 }
 
 export function convertTo12Bit(value: number): number {
-    return value & 0xfff;
+    return (value & 0xfff) << 4;
 }
 
 // Function to recover the original value based on assumptions

@@ -27,7 +27,7 @@ export class Index {
         );
     }
     readIndex(): EntryType<number, Buffer>[] {
-        const data = this.fs.readFileSync(".git/index");
+        const data = this.fs.readFileSync("./GIT_DIR/.git/index");
 
         const [signature, versionNumber, entriyCount] = [0, 4, 8].map(
             (offset, _) => data.readUInt32BE(offset)
