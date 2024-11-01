@@ -86,11 +86,12 @@ export class Commit {
         commitInfo.push(``);
 
         const rawFileContent = Buffer.from(commitInfo.join("\n"), "utf-8");
-        /*const header = Buffer.from(`commit ${rawFileContent.length}\0`);
+        /*
+        */
+        const header = Buffer.from(`commit ${rawFileContent.length}\0`);
         const store = Buffer.concat([header, rawFileContent]);
 
         const SHA = crypto.createHash("sha1").update(store).digest("hex");
-        */
 
         return SHA;
     }

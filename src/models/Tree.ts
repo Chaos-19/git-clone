@@ -116,7 +116,7 @@ export class Tree extends Common {
             } else return entr;
         });
 
-        const directoryHash = this.hashObjct(
+        const directoryHash = this.hashObject(
             Buffer.concat(hashes),
             "tree",
             false

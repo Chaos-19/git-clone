@@ -54,30 +54,39 @@ export class Repository {
     // Add files to the index
     add(file: string): void {
         try {
-            let exist = this.fs.existsSync(file);
+          
+            {let exist = this.fs.existsSync(`./test/${file}`);
 
             if (!exist) return;
 
-            const rawFileContent = this.fs.readFileSync(file);
-            const header = Buffer.from(`blob ${this.fs.statSync(file).size}\0`);
+            const rawFileContent = this.fs.readFileSync(`test/${file}`);
+            const header = Buffer.from(
+                `blob ${this.fs.statSync(`test/${file}`).size}\0`
+            );
             const store = Buffer.concat([header, rawFileContent]);
 
-            const SHA = ""; //this.hashObject(file);
+            const SHA = crypto.createHash("sha1").update(store).digest("hex");
 
-            const compressBlob = zlib.deflateSync(store);
+            //this.hashObject(file);
+            /*console.log(rawFileContent.slice(0, 10).toString());
+            const compressBlob = zlib.deflateSync(store);*/
 
-            exist = this.fs.existsSync(`.git/objects/${SHA.slice(0, 2)}`);
+            exist = this.fs.existsSync(
+                `./test/.git/objects/${SHA.slice(0, 2)}`
+            );
 
             if (!exist)
-                this.fs.mkdirSync(`.git/objects/${SHA.slice(0, 2)}`, {
+                this.fs.mkdirSync(`./test/.git/objects/${SHA.slice(0, 2)}`, {
                     recursive: true
                 });
 
-            const path = `.git/objects/${SHA.slice(0, 2)}/${SHA.slice(2)}`;
+            const path = `./test/.git/objects/${SHA.slice(0, 2)}/${SHA.slice(
+                2
+            )}`;
 
-            this.fs.writeFileSync(path, compressBlob);
+            //this.fs.writeFileSync(path, compressBlob);
 
-            const state = this.fs.statSync(path);
+            const state = this.fs.statSync(`test/${file}`);
 
             const {
                 dev, // Device ID
@@ -108,7 +117,7 @@ export class Repository {
                 file.length,
                 SHA,
                 file
-            );
+            );}
             this.index.addEntry(newEntry);
 
             this.index.writeToIndexFile([newEntry.getWritebleEntry()]);

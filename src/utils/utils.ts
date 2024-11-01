@@ -34,7 +34,7 @@ export function convertTimeToGit({
 }
 
 export function convertTo12Bit(value: number): number {
-    return (value & 0xfff) << 4;
+    return value > 0xfff ? value & 0xfff : value;
 }
 
 // Function to recover the original value based on assumptions
@@ -55,3 +55,94 @@ export const getFileMode = (stats: any) => {
     }
     return null;
 };
+
+export function normalizeMode(mode) {
+    // Note: BrowserFS will use -1 for "unknown"
+    // I need to make it non-negative for these bitshifts to work.
+    let type = mode > 0 ? mode >> 12 : 0;
+    // If it isn't valid, assume it as a "regular file"
+    // 0100 = directory
+    // 1000 = regular file
+    // 1010 = symlink
+    // 1110 = gitlink
+    if (
+        type !== 0b0100 &&
+        type !== 0b1000 &&
+        type !== 0b1010 &&
+        type !== 0b1110
+    ) {
+        type = 0b1000;
+    }
+    let permissions = mode & 0o777;
+    // Is the file executable? then 755. Else 644.
+    if (permissions & 0b001001001) {
+        permissions = 0o755;
+    } else {
+        permissions = 0o644;
+    }
+    // If it's not a regular file, scrub all permissions
+    if (type !== 0b1000) permissions = 0;
+    return (type << 12) + permissions;
+}
+const MAX_UINT32 = 2 ** 32;
+
+function SecondsNanoseconds(
+    givenSeconds,
+    givenNanoseconds,
+    milliseconds,
+    date
+) {
+    if (givenSeconds !== undefined && givenNanoseconds !== undefined) {
+        return [givenSeconds, givenNanoseconds];
+    }
+    if (milliseconds === undefined) {
+        milliseconds = date.valueOf();
+    }
+    const seconds = Math.floor(milliseconds / 1000);
+    const nanoseconds = (milliseconds - seconds * 1000) * 1000000;
+    return [seconds, nanoseconds];
+}
+
+export function normalizeStats(e) {
+    const [ctimeSeconds, ctimeNanoseconds] = SecondsNanoseconds(
+        e.ctimeSeconds,
+        e.ctimeNanoseconds,
+        e.ctimeMs,
+        e.ctime
+    );
+    const [mtimeSeconds, mtimeNanoseconds] = SecondsNanoseconds(
+        e.mtimeSeconds,
+        e.mtimeNanoseconds,
+        e.mtimeMs,
+        e.mtime
+    );
+
+    return {
+        ctimeSeconds: ctimeSeconds % MAX_UINT32,
+        ctimeNanoseconds: ctimeNanoseconds % MAX_UINT32,
+        mtimeSeconds: mtimeSeconds % MAX_UINT32,
+        mtimeNanoseconds: mtimeNanoseconds % MAX_UINT32,
+        dev: e.dev % MAX_UINT32,
+        ino: e.ino % MAX_UINT32,
+        mode: normalizeMode(e.mode % MAX_UINT32),
+        uid: e.uid % MAX_UINT32,
+        gid: e.gid % MAX_UINT32,
+        // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
+        // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
+        size: e.size > -1 ? e.size % MAX_UINT32 : 0
+    };
+}
+function renderCacheEntryFlags(entry) {
+    const flags = entry.flags;
+    // 1-bit extended flag (must be zero in version 2)
+    flags.extended = false;
+    // 12-bit name length if the length is less than 0xFFF; otherwise 0xFFF
+    // is stored in this field.
+    flags.nameLength = Math.min(Buffer.from(entry.path).length, 0xfff);
+    return (
+        (flags.assumeValid ? 0b1000000000000000 : 0) +
+        (flags.extended ? 0b0100000000000000 : 0) +
+        ((flags.stage & 0b11) << 12) +
+        (flags.nameLength & 0b111111111111)
+    );
+}

@@ -621,7 +621,7 @@ class Clone extends Common {
                         uid,
                         gid,
                         size,
-                        convertTo12Bit(entry.path.length),
+                        entry.path.length,
                         entry.sha1,
                         entry.path
                     );
@@ -629,11 +629,11 @@ class Clone extends Common {
                     return newEntry.getWritebleEntry();
                 });
 
-            this.writeToIndexFile(entryListForIndex);
+            this.writeToIndexFile([entryListForIndex[0]]);
         }
     }
     getIndexHeader(entriesCount: number) {
-        const signature = Buffer.from("DIRC", "utf-8");
+        const signature = Buffer.from("DIRC", "utf8");
         const version = Buffer.alloc(4);
         version.writeUInt32BE(2, 0);
         const numEntries = Buffer.alloc(4);
@@ -645,7 +645,7 @@ class Clone extends Common {
         let indexContent = this.getIndexHeader(entries.length);
 
         entries.forEach(entry => {
-            console.log(entry.flags);
+            //console.log(entry.flags);
             const fields = Buffer.concat([
                 entry.ctime_s,
                 entry.ctime_n,
@@ -661,9 +661,12 @@ class Clone extends Common {
                 entry.flags
             ]);
 
-            const padding = Math.trunc(
+            const padding = 8 - ((entry.path.length - 2) % 8);
+            /*Math.trunc(
                 (8 - ((entry.path.length + 62) % 8)) % 8
-            );
+            );*/
+
+            //Math.ceil((62 + bpath.length + 1) / 8) * 8
 
             // Create padding buffer
             const paddingBuffer = Buffer.alloc(padding, 0);
@@ -787,19 +790,20 @@ const cloneFun = new Clone(
     "https://github.com/Chaos-19/json-graph-acode.git",
     "GIT_DIR"
 );
-/*
+
 cloneFun.cloneRepo();
-cloneFun.extractRefHash(
-    `001e# service=git-upload-pack
+cloneFun
+    .extractRefHash(
+        `001e# service=git-upload-pack
 000001532c221913c1ae3954021962833974ff58a9a8d623 HEAD multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed allow-tip-sha1-in-want allow-reachable-sha1-in-want no-done symref=HEAD:refs/heads/main filter object-format=sha1 agent=git/github-dd2ba9052dea
 004183c16c998652f770d6c4ea38ec8bfcd02c5cb716 refs/heads/gh-pages
 003d2c221913c1ae3954021962833974ff58a9a8d623 refs/heads/main
 0000`,
-    false
-);
+        false
+    )
     .then(res => cloneFun.createRefs(res as { refs: RefType[]; head: string }));
-*/
-const { FsFileAdapter } = require("../adapters/FsFileAdapter");
+
+/*const { FsFileAdapter } = require("../adapters/FsFileAdapter");
 const fileAdapter: typeof FsFileAdapter = FsFileAdapter.getInstace();
 const index = new Index();
 console.log();
@@ -818,3 +822,4 @@ fileAdapter.writeFileSync(
         }))
     )
 );
+*/

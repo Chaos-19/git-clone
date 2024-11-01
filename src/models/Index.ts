@@ -90,6 +90,7 @@ export class Index {
     writeToIndexFile(entries: EntryType<Buffer, Buffer>[]) {
         let indexContent = this.getIndexHeader(entries.length);
 
+        let idx = 0;
         entries.forEach(entry => {
             if (!this.entryExists(entry.path.toString())) {
                 const fields = Buffer.concat([
@@ -106,15 +107,16 @@ export class Index {
                     entry.sha1,
                     entry.flags
                 ]);
+                idx = 62 + entry.path.length;
 
-                const padding =
-                    Math.trunc((62 + entry.path.length + 8) / 8) * 8;
-
+                const padding = 8 - ((entry.path.length - 2) % 8);
+                let paddingBuffer = Buffer.alloc(0);
                 // Create padding buffer
-                const paddingBuffer = Buffer.alloc(
-                    padding - (entry.path.length + 62),
-                    0
-                );
+                if (idx % 8 != 0) {
+                    let pad = 8 - (idx % 8);
+                    paddingBuffer = Buffer.alloc(pad, 0);
+                    idx += pad;
+                }
 
                 const entryBuffer = Buffer.concat([
                     fields,
@@ -129,10 +131,13 @@ export class Index {
         const indexSHA = crypto
             .createHash("sha1")
             .update(indexContent)
-            .digest();
+            .digest("hex");
 
-        const finalIndexContent = Buffer.concat([indexContent, indexSHA]);
+        const finalIndexContent = Buffer.concat([
+            indexContent,
+            Buffer.from(indexSHA, "hex")
+        ]);
 
-        this.fs.writeFileSync(".git/index", finalIndexContent);
+        this.fs.writeFileSync("./test/.git/index", finalIndexContent);
     }
 }
