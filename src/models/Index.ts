@@ -92,40 +92,40 @@ export class Index {
 
         let idx = 0;
         entries.forEach(entry => {
-            if (!this.entryExists(entry.path.toString())) {
-                const fields = Buffer.concat([
-                    entry.ctime_s,
-                    entry.ctime_n,
-                    entry.mtime_s,
-                    entry.mtime_n,
-                    entry.dev,
-                    entry.ino,
-                    entry.mode,
-                    entry.uid,
-                    entry.gid,
-                    entry.size,
-                    entry.sha1,
-                    entry.flags
-                ]);
-                idx = 62 + entry.path.length;
+            console.log(entry);
+            //if (!this.entryExists(entry.path.toString())) {}
+            const fields = Buffer.concat([
+                entry.ctime_s,
+                entry.ctime_n,
+                entry.mtime_s,
+                entry.mtime_n,
+                entry.dev,
+                entry.ino,
+                entry.mode,
+                entry.uid,
+                entry.gid,
+                entry.size,
+                entry.sha1,
+                entry.flags
+            ]);
+            idx = 62 + entry.path.length;
 
-                const padding = 8 - ((entry.path.length - 2) % 8);
-                let paddingBuffer = Buffer.alloc(0);
-                // Create padding buffer
-                if (idx % 8 != 0) {
-                    let pad = 8 - (idx % 8);
-                    paddingBuffer = Buffer.alloc(pad, 0);
-                    idx += pad;
-                }
-
-                const entryBuffer = Buffer.concat([
-                    fields,
-                    entry.path,
-                    paddingBuffer
-                ]);
-
-                indexContent = Buffer.concat([indexContent, entryBuffer]);
+            const padding = 8 - ((entry.path.length - 2) % 8);
+            let paddingBuffer = Buffer.alloc(0);
+            // Create padding buffer
+            if (idx % 8 != 0) {
+                let pad = 8 - (idx % 8);
+                paddingBuffer = Buffer.alloc(pad, 0);
+                idx += pad;
             }
+
+            const entryBuffer = Buffer.concat([
+                fields,
+                entry.path,
+                paddingBuffer
+            ]);
+
+            indexContent = Buffer.concat([indexContent, entryBuffer]);
         });
 
         const indexSHA = crypto

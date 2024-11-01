@@ -52,77 +52,96 @@ export class Repository {
     }
 
     // Add files to the index
-    add(file: string): void {
+    add(files: string[]): void {
         try {
-          
-            {let exist = this.fs.existsSync(`./test/${file}`);
+            const indexEntryLs = files.map(file => {
+                let exist = this.fs.existsSync(`./test/${file}`);
 
-            if (!exist) return;
+                if (!exist) return;
 
-            const rawFileContent = this.fs.readFileSync(`test/${file}`);
-            const header = Buffer.from(
-                `blob ${this.fs.statSync(`test/${file}`).size}\0`
-            );
-            const store = Buffer.concat([header, rawFileContent]);
+                const rawFileContent = this.fs.readFileSync(`test/${file}`);
+                const header = Buffer.from(
+                    `blob ${this.fs.statSync(`test/${file}`).size}\0`
+                );
+                const store = Buffer.concat([header, rawFileContent]);
 
-            const SHA = crypto.createHash("sha1").update(store).digest("hex");
+                const SHA = crypto
+                    .createHash("sha1")
+                    .update(store)
+                    .digest("hex");
 
-            //this.hashObject(file);
-            /*console.log(rawFileContent.slice(0, 10).toString());
-            const compressBlob = zlib.deflateSync(store);*/
+                //this.hashObject(file);
+                /*console.log(rawFileContent.slice(0, 10).toString());
+                 */
+                const compressBlob = zlib.deflateSync(store);
 
-            exist = this.fs.existsSync(
-                `./test/.git/objects/${SHA.slice(0, 2)}`
-            );
+                exist = this.fs.existsSync(
+                    `./test/.git/objects/${SHA.slice(0, 2)}`
+                );
 
-            if (!exist)
-                this.fs.mkdirSync(`./test/.git/objects/${SHA.slice(0, 2)}`, {
-                    recursive: true
-                });
+                if (!exist)
+                    this.fs.mkdirSync(`test/.git/objects/${SHA.slice(0, 2)}`, {
+                        recursive: true
+                    });
 
-            const path = `./test/.git/objects/${SHA.slice(0, 2)}/${SHA.slice(
-                2
-            )}`;
+                const path = `test/.git/objects/${SHA.slice(0, 2)}/${SHA.slice(
+                    2
+                )}`;
+                if (!this.fs.existsSync(path))
+                    this.fs.writeFileSync(path, compressBlob);
 
-            //this.fs.writeFileSync(path, compressBlob);
+                const state = this.fs.statSync(`test/${file}`);
 
-            const state = this.fs.statSync(`test/${file}`);
+                const {
+                    dev, // Device ID
+                    ino, // Inode number
+                    mode, // File mode/permissions
+                    uid, // User ID of the file owner
+                    gid, // Group ID of the file owner
+                    size, // Size of the file in bytes
+                    ctimeMs, // Creation/change time in milliseconds
+                    mtimeMs // Modification time in milliseconds
+                } = state;
 
-            const {
-                dev, // Device ID
-                ino, // Inode number
-                mode, // File mode/permissions
-                uid, // User ID of the file owner
-                gid, // Group ID of the file owner
-                size, // Size of the file in bytes
-                ctimeMs, // Creation/change time in milliseconds
-                mtimeMs // Modification time in milliseconds
-            } = state;
+                const { ctime_s, ctime_n, mtime_s, mtime_n } = convertTimeToGit(
+                    {
+                        ctimeMs,
+                        mtimeMs
+                    }
+                );
+                const newEntry = new Entry(
+                    ctime_s,
+                    ctime_n,
+                    mtime_s,
+                    mtime_n,
+                    dev,
+                    ino,
+                    mode,
+                    uid,
+                    gid,
+                    size,
+                    file.length,
+                    SHA,
+                    file
+                );
 
-            const { ctime_s, ctime_n, mtime_s, mtime_n } = convertTimeToGit({
-                ctimeMs,
-                mtimeMs
+                this.index.addEntry(newEntry);
+                return newEntry.getWritebleEntry();
             });
-            const newEntry = new Entry(
-                ctime_s,
-                ctime_n,
-                mtime_s,
-                mtime_n,
-                dev,
-                ino,
-                mode,
-                uid,
-                gid,
-                size,
-                file.length,
-                SHA,
-                file
-            );}
-            this.index.addEntry(newEntry);
 
-            this.index.writeToIndexFile([newEntry.getWritebleEntry()]);
+            console.log(indexEntryLs.filter(v => v !== undefined).length);
+            console.log(
+                indexEntryLs.map(v => ({
+                    ...v,
+                    path: v?.path.toString()
+                }))
+            );
 
-            console.log(`${file} added to index.`);
+            this.index.writeToIndexFile(
+                indexEntryLs.filter(v => v !== undefined)
+            );
+
+            console.log(`files added to index.`);
         } catch (error) {
             console.log(error);
         }
