@@ -581,7 +581,7 @@ class Clone extends Common {
             });
 
             const entryListForIndex = parsedTree
-                .sort((a, b) => a.path.localeCompare(b.path))
+                .sort((a, b) => -(a < b) || +(a > b))
                 .map(entry => {
                     const currentEntry = unpackedObject.find(
                         obj => obj.sha1 == entry.sha1
@@ -629,7 +629,7 @@ class Clone extends Common {
                     return newEntry.getWritebleEntry();
                 });
 
-            this.writeToIndexFile([entryListForIndex[0]]);
+            this.writeToIndexFile(entryListForIndex);
         }
     }
     getIndexHeader(entriesCount: number) {
@@ -644,8 +644,9 @@ class Clone extends Common {
     writeToIndexFile(entries: EntryType<Buffer, Buffer>[]) {
         let indexContent = this.getIndexHeader(entries.length);
 
+        let idx = 0;
         entries.forEach(entry => {
-            //console.log(entry.flags);
+            //if (!this.entryExists(entry.path.toString())) {}
             const fields = Buffer.concat([
                 entry.ctime_s,
                 entry.ctime_n,
@@ -660,16 +661,16 @@ class Clone extends Common {
                 entry.sha1,
                 entry.flags
             ]);
+            idx = 62 + entry.path.length;
 
             const padding = 8 - ((entry.path.length - 2) % 8);
-            /*Math.trunc(
-                (8 - ((entry.path.length + 62) % 8)) % 8
-            );*/
-
-            //Math.ceil((62 + bpath.length + 1) / 8) * 8
-
+            let paddingBuffer = Buffer.alloc(0);
             // Create padding buffer
-            const paddingBuffer = Buffer.alloc(padding, 0);
+            if (idx % 8 != 0) {
+                let pad = 8 - (idx % 8);
+                paddingBuffer = Buffer.alloc(pad, 0);
+                idx += pad;
+            }
 
             const entryBuffer = Buffer.concat([
                 fields,
@@ -678,17 +679,17 @@ class Clone extends Common {
             ]);
 
             indexContent = Buffer.concat([indexContent, entryBuffer]);
-            //return entryBuffer;
         });
-
-        //indexContent = Buffer.concat([indexContent, allEntry]);
 
         const indexSHA = crypto
             .createHash("sha1")
             .update(indexContent)
-            .digest();
+            .digest("hex");
 
-        const finalIndexContent = Buffer.concat([indexContent, indexSHA]);
+        const finalIndexContent = Buffer.concat([
+            indexContent,
+            Buffer.from(indexSHA, "hex")
+        ]);
 
         this.fs.writeFileSync(`${this.ROOT_DIR}.git/index`, finalIndexContent);
     }
@@ -745,6 +746,7 @@ class Clone extends Common {
 
         return entryList;
     }
+    createConfigFile(): void {}
 
     async fetchPack() {
         return await readFile(path.join("test", "AngularBlogApp.pack"));
@@ -752,18 +754,19 @@ class Clone extends Common {
     }
 
     cloneRepo() {
-        /*this.getAvalableRefFromServer()
-            .then(ref => {
-            this.createRefs(ref as {
-            refs: RefType[]; head: string 
-              
-            })
-            return this.extractRefHash(ref)
+        this.getAvalableRefFromServer()
+            .then(async ref => {
+                this.createRefs(
+                    (await this.extractRefHash(ref, false)) as {
+                        refs: RefType[];
+                        head: string;
+                    }
+                );
+                return this.extractRefHash(ref);
             })
             .then(({ ref, hash }: { ref: string; hash: string }) =>
                 this.getPackFile(hash)
-            )*/
-        this.fetchPack()
+            )
             .then(res => this.parsePackFile(Buffer.from(res)))
             .then(unpacked => {
                 const deltas = unpacked.filter(v => v?.type == "OBJ_REF_DELTA");
@@ -792,34 +795,3 @@ const cloneFun = new Clone(
 );
 
 cloneFun.cloneRepo();
-cloneFun
-    .extractRefHash(
-        `001e# service=git-upload-pack
-000001532c221913c1ae3954021962833974ff58a9a8d623 HEAD multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed allow-tip-sha1-in-want allow-reachable-sha1-in-want no-done symref=HEAD:refs/heads/main filter object-format=sha1 agent=git/github-dd2ba9052dea
-004183c16c998652f770d6c4ea38ec8bfcd02c5cb716 refs/heads/gh-pages
-003d2c221913c1ae3954021962833974ff58a9a8d623 refs/heads/main
-0000`,
-        false
-    )
-    .then(res => cloneFun.createRefs(res as { refs: RefType[]; head: string }));
-
-/*const { FsFileAdapter } = require("../adapters/FsFileAdapter");
-const fileAdapter: typeof FsFileAdapter = FsFileAdapter.getInstace();
-const index = new Index();
-console.log();
-fileAdapter.writeFileSync(
-    "str.test.json",
-    JSON.stringify(
-        index.readIndex().map(val => ({
-            path: val.path.toString(),
-            sha1: val.sha1,
-            exist: fileAdapter.existsSync(
-                `./GIT_DIR/.git/objects/${val.sha1.slice(
-                    0,
-                    2
-                )}/${val.sha1.slice(2)}`
-            )
-        }))
-    )
-);
-*/

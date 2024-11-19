@@ -29,21 +29,24 @@ repo.add([
         "test.txt",
         "traves.js",
         ...[
-    "AngularBlogApp.pack",
-    "BufferCursor.js",
-    "Clo.md",
-    "GitIndex.js",
-    "comparePath.js",
-    "compareStrings.js",
-    "fetch.js",
-    "json.pack",
-    "normalizeMode.js",
-    "normalizeStats.js",
-    "pack.file",
-    "sample1.pack",
-    "sample2.pack",
-    "ws-pra.js"
-]
+            "AngularBlogApp.pack",
+            "BufferCursor.js",
+            "Clo.md",
+            "GitIndex.js",
+            "comparePath.js",
+            "compareStrings.js",
+            "fetch.js",
+            "json.pack",
+            "normalizeMode.js",
+            "normalizeStats.js",
+            "pack.file",
+            "sample1.pack",
+            "sample2.pack",
+            "ws-pra.js",
+            "wyag/LICENSE",
+            "wyag/libwyag.py",
+            "wyag/wyag"
+        ]
     ])
 ]);
 /*repo.init();
